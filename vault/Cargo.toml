@@ -7,7 +7,7 @@ edition = "2021"
 crate-type = ["cdylib", "lib"]
 
 [features]
-default = []
+default = ["optimized"]
 native = ["solana-program"] # Not bad, but we can do better
 optimized = ["pinocchio", "five8_const", "solana-nostd-sha256"] # Much better!
 based = [] # lol dependencies

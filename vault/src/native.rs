@@ -23,6 +23,8 @@ pub fn process_instruction(_program_id: &Pubkey, accounts: &[AccountInfo], data:
         return Err(ProgramError::NotEnoughAccountKeys);
     };
 
+    assert!(signer.is_signer);
+
     let lamports: u64 = u64::from_le_bytes([
         data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7],
     ]);

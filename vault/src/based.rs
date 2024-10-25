@@ -77,8 +77,8 @@ pub unsafe extern "C" fn entrypoint(input: *mut u8) {
     
     let lamports: u64 = unsafe { *(input.add(0x50d0) as *const u64) };
 
-    // Transfer lamports balance to signer
-    *(input.add(0x0050) as *mut u64) += lamports;
-    // Wipe lamports
+    // Deduct lamports from PDA
     *(input.add(0x28b0) as *mut u64) -= lamports;
+    // Add lamports to Signer
+    *(input.add(0x0050) as *mut u64) += lamports;
 }

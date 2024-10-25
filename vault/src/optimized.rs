@@ -20,6 +20,8 @@ pub fn withdraw(_program_id: &Pubkey, accounts: &[AccountInfo], data: &[u8]) -> 
         return Err(ProgramError::NotEnoughAccountKeys);
     };
 
+    assert!(signer.is_signer());
+
     let lamports: u64 = unsafe { *(data.as_ptr() as *const u64) };
     let bump = data[8];
     let pda = hashv(&[
