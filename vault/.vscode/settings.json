@@ -1,0 +1,7 @@
+{
+    "rust-analyzer.cargo.target": "sbf-solana-solana",
+    "rust-analyzer.cargo.extraEnv": {
+        "CARGO": "/Users/elon/.local/share/solana/install/active_release/bin/sdk/sbf/dependencies/platform-tools/rust/bin/cargo",
+        "RUSTC": "/Users/elon/.local/share/solana/install/active_release/bin/sdk/sbf/dependencies/platform-tools/rust/bin/rustc"
+    }
+}
