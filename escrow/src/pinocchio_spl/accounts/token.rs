@@ -1,6 +1,4 @@
-use pinocchio::account_info::AccountInfo;
-use solana_program::pubkey::Pubkey;
-
+use pinocchio::{account_info::AccountInfo, pubkey::Pubkey};
 use super::AccountState;
 
 pub struct TokenAccount(*const u8);

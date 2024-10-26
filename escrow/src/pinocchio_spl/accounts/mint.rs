@@ -1,5 +1,4 @@
-use pinocchio::account_info::AccountInfo;
-use solana_program::pubkey::Pubkey;
+use pinocchio::{account_info::AccountInfo, pubkey::Pubkey};
 pub struct Mint(*const u8);
 
 impl Mint {
