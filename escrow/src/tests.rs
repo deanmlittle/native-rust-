@@ -19,12 +19,14 @@ mod tests {
         
         let (system_program, system_program_account) = program::keyed_account_for_system_program();
 
+        let data = [maker.to_bytes().to_vec(), maker_ta_b.to_bytes().to_vec(), mint_a.to_bytes().to_vec(), mint_b.to_bytes().to_vec(), 1_000_000u64.to_le_bytes().to_vec()].concat();
+
         let instruction = Instruction::new_with_bytes(
             program_id,
-            &[maker.as_ref(), maker_ta_b.as_ref(), mint_a.as_ref(), mint_b.as_ref(), &1_000_000u64.to_le_bytes()].concat(),
+            &data,
             vec![
                 AccountMeta::new(maker, true),
-                AccountMeta::new(escrow, false), // It should be a signer because this account shouldn't exist yet
+                AccountMeta::new(escrow, true), // It should be a signer because this account shouldn't exist yet
                 AccountMeta::new_readonly(system_program, false)
             ],
         );
