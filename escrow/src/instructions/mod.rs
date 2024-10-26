@@ -4,7 +4,7 @@ use pinocchio::program_error::ProgramError;
 pub enum EscrowInstruction {
     Make,
     Take,
-    Refund
+    Refund,
 }
 
 impl TryFrom<&u8> for EscrowInstruction {
@@ -15,7 +15,7 @@ impl TryFrom<&u8> for EscrowInstruction {
             0 => Ok(EscrowInstruction::Make),
             1 => Ok(EscrowInstruction::Take),
             2 => Ok(EscrowInstruction::Refund),
-            _ => Err(ProgramError::InvalidInstructionData)
+            _ => Err(ProgramError::InvalidInstructionData),
         }
     }
 }

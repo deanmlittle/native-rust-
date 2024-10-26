@@ -2,9 +2,9 @@ use core::mem::MaybeUninit;
 
 use pinocchio::{
     account_info::AccountInfo,
+    entrypoint::ProgramResult,
     instruction::{AccountMeta, Instruction, Signer},
     program::invoke_signed,
-    entrypoint::ProgramResult,
 };
 
 /// Transfer lamports.
@@ -49,10 +49,10 @@ impl<'a> Transfer<'a> {
         unsafe {
             // Get a mutable pointer to the instruction_data
             let ptr = instruction_data.as_mut_ptr() as *mut u8;
-        
+
             // Write 3 as u32 to the first 4 bytes
             *(ptr as *mut u32) = 3;
-        
+
             // Write self.amount as u64 to the next 8 bytes
             *(ptr.add(4) as *mut u64) = self.amount;
         }

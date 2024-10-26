@@ -1,5 +1,4 @@
-use bytemuck::{Pod, Zeroable};
-use pinocchio::{account_info::AccountInfo, pubkey::Pubkey};
+use pinocchio::pubkey::Pubkey;
 
 #[repr(C)]
 #[derive(Clone, Copy)]
@@ -14,18 +13,4 @@ pub struct Escrow {
 
 impl Escrow {
     pub const LEN: usize = 112;
-}
-
-pub struct EscrowAccount(*const Escrow);
-
-impl EscrowAccount {
-    pub const LEN: usize = 112;
-
-    pub fn from_account_info(account_info: &AccountInfo) -> Self {
-        assert_eq!(account_info.owner(), &crate::ID);
-        assert_eq!(account_info.data_len(), Self::LEN);
-        unsafe {
-            Self(account_info.borrow_data_unchecked().as_ptr() as *const Escrow)
-        }
-    }
 }
