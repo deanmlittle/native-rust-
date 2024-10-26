@@ -40,6 +40,8 @@ pub fn make(accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
         return Err(ProgramError::NotEnoughAccountKeys);
     };
 
+    assert!(escrow.is_signer());
+
     // Copy maker key
     unsafe { 
         *(escrow.borrow_mut_data_unchecked().as_mut_ptr() as *mut Pubkey) = *maker.key()
