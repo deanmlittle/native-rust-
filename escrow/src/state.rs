@@ -10,5 +10,3 @@ pub struct Escrow {
     pub mint_b: Pubkey,
     pub receive: u64,
 }
-
-pub const ESCROW_SIZE: usize = 8 + 32 + 32 + 32 + 8;

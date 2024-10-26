@@ -1,8 +1,8 @@
-use five8_const::decode_32_const;
 use pinocchio::{
-    account_info::AccountInfo, entrypoint::ProgramResult, program_error::ProgramError,
-    pubkey::Pubkey,
+    account_info::AccountInfo, entrypoint::ProgramResult, instruction::{Seed, Signer}, program::invoke_signed, program_error::ProgramError, pubkey::Pubkey
 };
+
+use crate::pinocchio_spl::{Transfer, CloseAccount};
 
 /// # Refund
 /// 
@@ -46,7 +46,20 @@ pub fn refund(_program_id: &Pubkey, accounts: &[AccountInfo], data: &[u8]) -> Pr
     let seeds = &[&data[0..7], maker.key().as_ref(), &[data[8]]];
 
     // Transfer out the Funds from the vault to the maker_ata_a
-    todo!();
+    let seeds_2 = [
+        Seed::from(&data[0..7]), 
+        Seed::from(maker.key().as_ref()), 
+        Seed::from(&[data[8]])
+    ];
+
+    let signer = Signer::from(seeds_2);
+
+    Transfer {
+        from: vault,
+        to: maker_ta_a,
+        authority: escrow,
+        amount: ,
+    }.invoke_signed(&[seeds])?;
 
     // Close vault
     todo!();
