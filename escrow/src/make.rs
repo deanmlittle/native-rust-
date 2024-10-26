@@ -1,6 +1,11 @@
 use crate::{state::Escrow, PDA_MARKER};
 use pinocchio::{
-    account_info::AccountInfo, entrypoint::ProgramResult, instruction::{Seed, Signer}, log, memory::sol_memcpy, msg, program_error::ProgramError, pubkey::Pubkey, sysvars::{rent::Rent, Sysvar}
+    account_info::AccountInfo,
+    entrypoint::ProgramResult,
+    memory::sol_memcpy,
+    program_error::ProgramError,
+    pubkey::Pubkey,
+    sysvars::{rent::Rent, Sysvar},
 };
 use pinocchio_system::instructions::CreateAccount;
 use solana_nostd_sha256::hashv;
@@ -22,7 +27,7 @@ use solana_nostd_sha256::hashv;
 /// > if they're not depositing token, nobody will "Take"
 /// > if the Vault is not owned by the program, the "Take" will fail
 /// 
-/// This checks should be performed Client Side on the "Take" instruction!
+///  This checks should be performed Client Side on the "Take" instruction!
 /// No need for this checks on refund either since if user doesn't do it,
 /// they're just losing their money
 ///
@@ -43,6 +48,8 @@ pub fn make(accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
         return Err(ProgramError::NotEnoughAccountKeys);
     };
 
+    assert!(escrow.data_is_empty());
+
     // Derive PDA using Hashv
     let lamports = Rent::get()?.minimum_balance(Escrow::LEN);
 
@@ -58,16 +65,6 @@ pub fn make(accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
         escrow.key().as_ref()
     );
 
-    let seed = [data[0]];
-
-    let seeds = [
-        Seed::from(&data[4..8]),
-        Seed::from(maker.key().as_ref()),
-        Seed::from(&seed),
-    ];
-
-    let signer = Signer::from(&seeds);
-
     CreateAccount {
         from: maker,
         to: escrow,
@@ -75,13 +72,12 @@ pub fn make(accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
         space: Escrow::LEN as u64,
         owner: &crate::ID,
     }
-    .invoke_signed(&[signer])?;
+    .invoke()?;
 
     // Copy everything except the maker key
     unsafe {
         sol_memcpy(escrow.borrow_mut_data_unchecked(), data, 80);
     }
-
     // Copy the maker key
     unsafe {
         *(escrow.borrow_mut_data_unchecked().as_mut_ptr().add(80) as *mut Pubkey) = *maker.key();

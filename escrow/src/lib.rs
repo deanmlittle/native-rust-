@@ -11,7 +11,6 @@ use make::make;
 use take::take;
 use refund::refund;
 
-#[cfg(test)]
 mod tests;
 
 entrypoint!(process_instruction);
