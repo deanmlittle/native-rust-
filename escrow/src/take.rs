@@ -14,23 +14,23 @@ use crate::pinocchio_spl::{Transfer, CloseAccount, accounts::TokenAccount};
 /// 
 /// -- Instruction Checks --
 
-pub fn take(_program_id: &Pubkey, accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
+pub fn take(accounts: &[AccountInfo]) -> ProgramResult {
 
-    let [taker, mint_a, mint_b, taker_ta_a, taker_ta_b, maker_ta_b, escrow, vault, token_program] = accounts else {
+    let [taker, taker_ta_a, taker_ta_b, maker_ta_b, escrow, vault, token_program] = accounts else {
         return Err(ProgramError::NotEnoughAccountKeys);
     };
 
     // Cast the maker from the Escrow
     let maker =  unsafe { *(escrow.borrow_data_unchecked().as_ptr().add(8) as *const Pubkey) };
 
-    // Cast the mintA from the Escrow
+    // // Cast the mintA from the Escrow
     let mint_a =  unsafe { *(escrow.borrow_data_unchecked().as_ptr().add(40) as *const Pubkey) };
 
-    // Cast the mintB from the Escrow
+    // // Cast the mintB from the Escrow
     let mint_b =  unsafe { *(escrow.borrow_data_unchecked().as_ptr().add(72) as *const Pubkey) };
 
     // Cast the receive as u64 since we just need to save it in the Escrow
-    let amout_b = unsafe { *(escrow.borrow_data_unchecked().as_ptr().add(104) as *const u64) };
+    let amount_b = unsafe { *(escrow.borrow_data_unchecked().as_ptr().add(104) as *const u64) };
 
     // Check maker_ata_a ownership
     assert_eq!(&TokenAccount::from_account_info(maker_ta_b).authority(), &maker);
@@ -45,17 +45,18 @@ pub fn take(_program_id: &Pubkey, accounts: &[AccountInfo], data: &[u8]) -> Prog
     let amount_a = TokenAccount::from_account_info(vault).amount();
 
     // Cast Seeds as [u8; 8] because we need it in the PDA derivation
-    let seeds = &data[0..7];
+    let seed = unsafe { *(escrow.borrow_data_unchecked().as_ptr() as *const [u8;4]) };
 
     // Cast Bump as u8 since we just need to save it in the Escrow
-    let bump = &[data[8]];
+    let bump = unsafe { [*(escrow.borrow_data_unchecked().as_ptr() as *const u8)] };
 
     // Derive the signer
     let seeds = [
-        Seed::from(seeds),
+        Seed::from(&seed),
         Seed::from(maker.as_ref()),
-        Seed::from(bump),
+        Seed::from(&bump),
     ];
+
     let signer = Signer::from(&seeds);
 
     // Transfer out the Funds from the vault to the vault to the taker_ata_a
@@ -78,7 +79,7 @@ pub fn take(_program_id: &Pubkey, accounts: &[AccountInfo], data: &[u8]) -> Prog
         from: taker_ta_b,
         to: maker_ta_b,
         authority: escrow,
-        amount: amout_b,
+        amount: amount_b,
     }.invoke()?;
 
     // Close the Escrow account by draining the lamports and setting the data_len to 0

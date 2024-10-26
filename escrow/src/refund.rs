@@ -1,5 +1,5 @@
 use pinocchio::{
-    account_info::AccountInfo, entrypoint::ProgramResult, instruction::{Seed, Signer}, program_error::ProgramError, pubkey::Pubkey
+    account_info::AccountInfo, entrypoint::ProgramResult, instruction::{Seed, Signer}, program_error::ProgramError
 };
 
 use crate::pinocchio_spl::{Transfer, CloseAccount, accounts::TokenAccount};
@@ -24,7 +24,7 @@ use crate::pinocchio_spl::{Transfer, CloseAccount, accounts::TokenAccount};
 /// + Check that Maker is a signer
 /// + Check the ownership of maker_ta_a 
 /// - No Check that the Escrow is derived correctly -> Cpi will fail
-pub fn refund(_program_id: &Pubkey, accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
+pub fn refund(accounts: &[AccountInfo]) -> ProgramResult {
 
     let [maker, maker_ta_a, escrow, vault, _token_program] = accounts else {
         return Err(ProgramError::NotEnoughAccountKeys);
@@ -39,16 +39,16 @@ pub fn refund(_program_id: &Pubkey, accounts: &[AccountInfo], data: &[u8]) -> Pr
     let amount = TokenAccount::from_account_info(vault).amount();
 
     // Cast Seeds as [u8; 8] because we need it in the PDA derivation
-    let seeds = &data[0..7];
+    let seed = unsafe { *(escrow.borrow_data_unchecked().as_ptr() as *const [u8;4]) };
 
     // Cast Bump as u8 since we just need to save it in the Escrow
-    let bump = &[data[8]];
+    let bump = unsafe { [*(escrow.borrow_data_unchecked().as_ptr() as *const u8)] };
 
     // Derive the signer
     let seeds = [
-        Seed::from(seeds),
+        Seed::from(seed.as_ref()),
         Seed::from(maker.key().as_ref()),
-        Seed::from(bump),
+        Seed::from(&bump),
     ];
     let signer = Signer::from(&seeds);
 

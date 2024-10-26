@@ -1,7 +1,7 @@
 use pinocchio::{
-    account_info::AccountInfo, entrypoint::ProgramResult, program_error::ProgramError,
-    pubkey::Pubkey,
+    account_info::AccountInfo, entrypoint::ProgramResult, memory::sol_memcpy, program_error::ProgramError, pubkey::Pubkey, sysvars::{rent::Rent, Sysvar}
 };
+use pinocchio_system::instructions::CreateAccount;
 use solana_nostd_sha256::hashv;
 use crate::{state::Escrow, PDA_MARKER};
 
@@ -37,44 +37,33 @@ use crate::{state::Escrow, PDA_MARKER};
 /// - No Check on ProgramID since we're changing data (it needs to have our ProgramID)
 /// - No Check on Space and Lamports, it will fail on creation
 
-pub fn make(program_id: &Pubkey, accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
-
+pub fn make(accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
     let [maker, escrow, _system_program] = accounts else {
         return Err(ProgramError::NotEnoughAccountKeys);
     };
 
-    // Cast seed as [u8; 8] because we need it in the PDA derivation
-    // Then we can cast it to u64 when we save the data in the Escrow
-    let seed = &data[0..7];
-
-    // Cast mint_a as Pubkey since we need it in the Escrow
-    let mint_a = unsafe { *(data[8..39].as_ptr() as *const Pubkey) };
-
-    // Cast mint_b as Pubkey since we need it in the Escrow
-    let mint_b = unsafe { *(data[40..71].as_ptr() as *const Pubkey) };
-
-    // Cast mint_b as Pubkey since we need it in the Escrow
-    let mint_b = unsafe { *(data[40..71].as_ptr() as *const Pubkey) };
-
-
-    // Cast reveive as u64 since we just need to save it in the Escrow
-    let receive = unsafe { *(data[72..79].as_ptr() as *const u64) };
-
-    // We can just use the bump as it is since it's just a u8
-    let bump = data[80];
+    assert!(escrow.data_is_empty());
 
     // Derive PDA using Hashv
-    assert_eq!(hashv(&[seed, maker.key().as_ref(), &[bump], program_id.as_ref(), PDA_MARKER]), escrow.key().as_ref());
+    let lamports = Rent::get()?.minimum_balance(Escrow::LEN);
 
-    // Cast the data to Escrow and save it in the Account    
-    unsafe { *(escrow.borrow_mut_data_unchecked().as_mut_ptr() as *mut Escrow) = Escrow {
-            seed: *(seed.as_ptr() as *const u64),
-            maker: *maker.key(),
-            mint_a,
-            mint_b,
-            receive,  
-        }
+    // Assert Escrow address is correct
+    assert_eq!(hashv(&[&data[4..8], maker.key().as_ref(), &[data[0]], crate::ID.as_ref(), PDA_MARKER]), escrow.key().as_ref());
+
+    CreateAccount {
+        from: maker,
+        to: escrow,
+        lamports,
+        space: Escrow::LEN as u64,
+        owner: &crate::ID,
+    }.invoke();
+    
+    // Copy everything except the maker key
+    unsafe {
+        sol_memcpy(escrow.borrow_mut_data_unchecked(), data, 80);
     }
+    // Copy the maker key
+    unsafe { *(escrow.borrow_mut_data_unchecked().as_mut_ptr().add(80) as *mut Pubkey) = *maker.key(); }
 
     Ok(())
 }

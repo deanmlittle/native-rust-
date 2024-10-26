@@ -659,6 +659,7 @@ dependencies = [
  "bytemuck",
  "five8_const",
  "pinocchio",
+ "pinocchio-system",
  "solana-nostd-sha256",
  "solana-program",
 ]
@@ -748,6 +749,26 @@ name = "pinocchio"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3be4a14e72d9098d35310de70667d5af8d7fc249ab8e26c54725f955c2dbd074"
+
+[[package]]
+name = "pinocchio-pubkey"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9ac574ce3df7d77dde0a4f24ca58ffa9c57d6141df7d82a2510d03fb1f500ff8"
+dependencies = [
+ "five8_const",
+ "pinocchio",
+]
+
+[[package]]
+name = "pinocchio-system"
+version = "0.1.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e22e8356e1dbbb7cf2f975e0e0001db1cef2b394b9afffed65a7efb5d420d994"
+dependencies = [
+ "pinocchio",
+ "pinocchio-pubkey",
+]
 
 [[package]]
 name = "ppv-lite86"

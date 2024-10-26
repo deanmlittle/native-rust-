@@ -17,6 +17,8 @@ mod pinocchio_spl;
 
 entrypoint!(process_instruction);
 
+pub const PDA_MARKER: &[u8;21] = b"ProgramDerivedAddress";
+
 pub const ID: [u8;32] = five8_const::decode_32_const("22222222222222222222222222222222222222222222");
 
 fn process_instruction(
