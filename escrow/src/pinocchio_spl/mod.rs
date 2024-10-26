@@ -5,3 +5,5 @@ pub use transfer::*;
 
 pub mod close_account;
 pub use close_account::*;
+
+pub mod accounts;
