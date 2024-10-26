@@ -11,70 +11,59 @@ const ID: [u8; 32] = decode_32_const("9HFegTZnvebYjf9kSa6k3WBm93hRfogWB5B1goUrq1
 const PDA_MARKER: &[u8; 21] = b"ProgramDerivedAddress";
 
 /// # Refund
-///
+/// 
 /// -- Data scheme --
 /// > Seed [u8; 8]
-/// > MintA [u8; 32]
-/// > MintB [u8; 32] 
-/// > Receive [x; 8]
-/// > Bump [x; 1]
+/// > bump [u8; 1]
 /// 
 /// -- Account & Instruction Optimization --
-/// We don't need to perform the "Deposit" in the Make instruction:
-/// > Create Vault (ATA with Escrow as owner) 
-/// > Transfer x Token from maker_ata_a to Vault
-/// Because:
-/// > if they're not depositing token, nobody will "Take"
-/// > if the Vault is not owned by the program, the "Take" will fail
-/// This checks should be performed Client Side on the "Take" instruction!
-/// No need for this checks on refund either since if user doesn't do it, 
-/// they're just losing their money
-///
-/// We don't need Mint B and Mint A accounts since we're not transferring tokens, we can
-/// just pass it as data and save it in the Escrow directly.
+/// We don't need the System program since we're not creating accounts
+/// and we're draining the lamports `borrow_mut_lamports_unchecked`
 /// 
-/// * Account Optimization == -5 accounts (mint_a, mint_b, maker_ata_a, vault, token_program)
+/// To close the account we drain all the lamports and set the data_len to 0
+/// by setting the 8 bytes before the data (data_len is u64) to 0 to prevent
+/// reinitialization attack
 /// 
-/// -- Escrow Checks --
-/// + Check that there is not Data already inside of it, or we'll just overwrite it
-/// + Check that the Escrow is derived correctly -> We could skip it, but if we 
-/// used the wrong seed, we would lose the fund forever
-/// - No Check on ProgramID since we're changing data (it needs to have our ProgramID)
-/// - No Check on Space and Lamports, it will fail on creation
+/// * Account Optimization == -1 accounts (system_program)
+/// 
+/// -- Checks --
+/// + Check that Maker is a signer
+/// + Check the ownership of maker_ta_a 
+/// - No Check that the Escrow is derived correctly -> Cpi will fail
 
-pub fn make(_program_id: &Pubkey, accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
+/// 
+/// For 
 
-    let [maker, escrow, _system_program] = accounts else {
+pub fn refund(_program_id: &Pubkey, accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
+
+    let [maker, mint_a, maker_ta_a, escrow, vault, token_program] = accounts else {
         return Err(ProgramError::NotEnoughAccountKeys);
     };
 
-    // Cast seed as [u8; 8] because we need it in the PDA derivation
-    // Then we can cast it to u64 when we save the data in the Escrow
-    let seed = &data[0..7];
+    assert!(maker.is_signer());
 
-    // Cast mint_a as Pubkey since we need it in the Escrow
-    let mint_a = unsafe { *(data[8..39].as_ptr() as *const Pubkey) };
+    // Check maker_ata_a ownership
+    todo!();
 
-    // Cast mint_b as Pubkey since we need it in the Escrow
-    let mint_b = unsafe { *(data[40..71].as_ptr() as *const Pubkey) };
+    // Get vault amount
+    todo!();
 
-    // Cast reveive as u64 since we just need to save it in the Escrow
-    let receive = unsafe { *(data[72..79].as_ptr() as *const u64) };
+    // Derive the seeds for the PDA
+    let seeds = &[&data[0..7], maker.key().as_ref(), &[data[8]]];
 
-    // We can just use the bump as it is since it's just a u8
-    let bump = data[80];
+    // Transfer out the Funds from the vault to the maker_ata_a
+    todo!();
 
-    // Derive PDA using Hashv
-    assert_eq!(hashv(&[seed, maker.key().as_ref(), &[bump], ID.as_ref(), PDA_MARKER]), escrow.key().as_ref());
+    // Close vault
+    todo!();
 
-    // Cast the data to Escrow and save it in the Account    
-    unsafe { *(escrow.borrow_mut_data_unchecked().as_mut_ptr() as *mut Escrow) = Escrow {
-            seed: *(seed.as_ptr() as *const u64),
-            maker: *maker.key(),
-            mint_a,
-            mint_b,
-            receive,  
-        }
+    // Close the Escrow account by draining the lamports and setting the data_len to 0
+    unsafe {
+        let lamports = escrow.borrow_lamports_unchecked();
+        *escrow.borrow_mut_lamports_unchecked() -= lamports;
+        *maker.borrow_mut_lamports_unchecked() += lamports;
+
+        *(escrow.borrow_mut_data_unchecked().as_mut_ptr().sub(8) as *mut u64) = 0;
     }
 
     Ok(())
