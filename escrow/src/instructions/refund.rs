@@ -5,7 +5,7 @@ use pinocchio::{
     program_error::ProgramError,
 };
 
-use crate::pinocchio_spl::{accounts::TokenAccount, CloseAccount, Transfer};
+use crate::{make, pinocchio_spl::{accounts::TokenAccount, CloseAccount, Transfer}, state::Escrow};
 
 /// # Refund
 ///
@@ -27,42 +27,36 @@ use crate::pinocchio_spl::{accounts::TokenAccount, CloseAccount, Transfer};
 /// + Check that Maker is a signer
 /// + Check the ownership of maker_ta_a
 /// - No Check that the Escrow is derived correctly -> Cpi will fail
-pub fn refund(accounts: &[AccountInfo]) -> ProgramResult {
-    let [maker, maker_ta_a, escrow, vault, _token_program] = accounts else {
+pub fn refund(accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
+    let [maker, maker_ta_a, escrow, vault, authority, _token_program] = accounts else {
         return Err(ProgramError::NotEnoughAccountKeys);
     };
 
-    // Check authority
-    assert_eq!(
-        &TokenAccount::from_account_info(maker_ta_a).authority(),
-        escrow.key()
-    );
+    // Ensure maker is signer
+    assert!(maker.is_signer());
 
-    // Get vault amount
-    let amount = TokenAccount::from_account_info(vault).amount();
-
-    // Cast Seeds as [u8; 8] because we need it in the PDA derivation
-    let seed = unsafe { *(escrow.borrow_data_unchecked().as_ptr() as *const [u8; 4]) };
+    // Ensure maker matches escrow maker
+    let escrow_account = Escrow::from_account_info(escrow);
+    assert_eq!(&escrow_account.maker(), maker.key());
 
     // Cast Bump as u8 since we just need to save it in the Escrow
-    let bump = unsafe { [*escrow.borrow_data_unchecked().as_ptr()] };
+    let bump = [data[0]];
 
     // Derive the signer
     let seeds = [
-        Seed::from(seed.as_ref()),
-        Seed::from(maker.key().as_ref()),
+        Seed::from(escrow.key().as_ref()),
         Seed::from(&bump),
     ];
-    let signer = Signer::from(&seeds);
+    let signer = [Signer::from(&seeds)];
 
-    // Transfer out the Funds from the vault to the maker_ata_a
+    // Transfer all funds from the vault to maker_ta_a
     Transfer {
         from: vault,
         to: maker_ta_a,
-        authority: escrow,
-        amount,
+        authority,
+        amount: TokenAccount::from_account_info_unchecked(vault).amount(),
     }
-    .invoke_signed(&[signer.clone()])?;
+    .invoke_signed(&signer)?;
 
     // Close vault
     CloseAccount {
@@ -70,14 +64,12 @@ pub fn refund(accounts: &[AccountInfo]) -> ProgramResult {
         to: maker,
         authority: escrow,
     }
-    .invoke_signed(&[signer.clone()])?;
+    .invoke_signed(&signer)?;
 
     // Close the Escrow account by draining the lamports and setting the data_len to 0
     unsafe {
-        let lamports = escrow.borrow_lamports_unchecked();
-        *escrow.borrow_mut_lamports_unchecked() -= lamports;
-        *maker.borrow_mut_lamports_unchecked() += lamports;
-
+        *maker.borrow_mut_lamports_unchecked() += *escrow.borrow_lamports_unchecked();
+        *escrow.borrow_mut_lamports_unchecked() = 0;
         *(escrow.borrow_mut_data_unchecked().as_mut_ptr().sub(8) as *mut u64) = 0;
     }
 

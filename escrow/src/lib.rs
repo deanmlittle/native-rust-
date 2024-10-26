@@ -32,6 +32,6 @@ fn process_instruction(
     match EscrowInstruction::try_from(discriminator)? {
         EscrowInstruction::Make => make(accounts, data),
         EscrowInstruction::Take => take(accounts),
-        EscrowInstruction::Refund => refund(accounts),
+        EscrowInstruction::Refund => refund(accounts, data),
     }
 }
