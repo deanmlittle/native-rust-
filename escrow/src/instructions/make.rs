@@ -29,8 +29,11 @@ use crate::state::Escrow;
 /// 
 /// Note: every CPI costs 1000 CUs, so we should avoid it as much as possible.
 /// 
-/// The trade-off of saving all this CUs is for a more "Client-heavy" approach, where the
-/// client needs to do more checks and operations to make the whole logic work as intended.
+/// -- Client Side Logic --
+/// The trade-off of saving all this CUs (from CPIs) is getting a more "Client-Heavy" approach, 
+/// where this are some of the atomic instruction that the client should do:
+/// - `create_account` with right Space, Lamports and ProgramId for Escrow
+/// - `create` and `transfer` for the Vault
 /// 
 /// -- Account Optimization Logic --
 /// -5 accounts from the Anchor Escrow (mint_a, mint_b, maker_ata_a, vault, token_program)
