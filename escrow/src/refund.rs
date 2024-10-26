@@ -3,18 +3,12 @@ use pinocchio::{
     account_info::AccountInfo, entrypoint::ProgramResult, program_error::ProgramError,
     pubkey::Pubkey,
 };
-use solana_nostd_sha256::hashv;
-use crate::state::Escrow;
-
-const ID: [u8; 32] = decode_32_const("9HFegTZnvebYjf9kSa6k3WBm93hRfogWB5B1goUrq1oL"); // todo
-
-const PDA_MARKER: &[u8; 21] = b"ProgramDerivedAddress";
 
 /// # Refund
 /// 
 /// -- Data scheme --
 /// > Seed [u8; 8]
-/// > bump [u8; 1]
+/// > Bump [u8; 1]
 /// 
 /// -- Account & Instruction Optimization --
 /// We don't need the System program since we're not creating accounts

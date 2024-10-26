@@ -1,14 +1,9 @@
-use five8_const::decode_32_const;
 use pinocchio::{
     account_info::AccountInfo, entrypoint::ProgramResult, program_error::ProgramError,
     pubkey::Pubkey,
 };
 use solana_nostd_sha256::hashv;
-use crate::state::Escrow;
-
-const ID: [u8; 32] = decode_32_const("9HFegTZnvebYjf9kSa6k3WBm93hRfogWB5B1goUrq1oL"); // todo
-
-const PDA_MARKER: &[u8; 21] = b"ProgramDerivedAddress";
+use crate::{state::Escrow, PDA_MARKER};
 
 /// # Make
 ///
@@ -42,7 +37,7 @@ const PDA_MARKER: &[u8; 21] = b"ProgramDerivedAddress";
 /// - No Check on ProgramID since we're changing data (it needs to have our ProgramID)
 /// - No Check on Space and Lamports, it will fail on creation
 
-pub fn make(_program_id: &Pubkey, accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
+pub fn make(program_id: &Pubkey, accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
 
     let [maker, escrow, _system_program] = accounts else {
         return Err(ProgramError::NotEnoughAccountKeys);
@@ -69,7 +64,7 @@ pub fn make(_program_id: &Pubkey, accounts: &[AccountInfo], data: &[u8]) -> Prog
     let bump = data[80];
 
     // Derive PDA using Hashv
-    assert_eq!(hashv(&[seed, maker.key().as_ref(), &[bump], ID.as_ref(), PDA_MARKER]), escrow.key().as_ref());
+    assert_eq!(hashv(&[seed, maker.key().as_ref(), &[bump], program_id.as_ref(), PDA_MARKER]), escrow.key().as_ref());
 
     // Cast the data to Escrow and save it in the Account    
     unsafe { *(escrow.borrow_mut_data_unchecked().as_mut_ptr() as *mut Escrow) = Escrow {
