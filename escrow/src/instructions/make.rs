@@ -1,8 +1,6 @@
 use pinocchio::{
-    account_info::AccountInfo, entrypoint::ProgramResult, msg, program_error::ProgramError, pubkey::Pubkey
+    account_info::AccountInfo, entrypoint::ProgramResult, program_error::ProgramError, pubkey::Pubkey
 };
-
-use crate::state::Escrow;
 
 /// # Make
 ///
@@ -39,8 +37,8 @@ use crate::state::Escrow;
 /// -5 accounts from the Anchor Escrow (mint_a, mint_b, maker_ata_a, vault, token_program)
 ///
 /// -- Checks --
-/// + Check that the data_len of Escrow is 0 before we actually put data inside of it to 
-///   avoid overwriting it (we could also check the data, but it's not necessary)
+/// + Check that the Escrow is a Signer, so we know that that account hasn't been used before
+///   avoid overwriting potential data inside of it.
 /// - Skip ProgramId check for Escrow, it will fail when we're adding data inside of it
 /// - Skip Space & Lamports check on the Escrow, it will fail on creation
 
@@ -49,6 +47,9 @@ pub fn make(accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
     let [maker, escrow, _system_program] = accounts else {
         return Err(ProgramError::NotEnoughAccountKeys);
     };
+
+    // Ensure maker is signer
+    assert!(maker.is_signer());
 
     // Copy maker key
     unsafe { 
