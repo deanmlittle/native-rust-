@@ -32,8 +32,6 @@ pub fn refund(accounts: &[AccountInfo]) -> ProgramResult {
         return Err(ProgramError::NotEnoughAccountKeys);
     };
 
-    assert!(maker.is_signer());
-
     // Check authority
     assert_eq!(
         &TokenAccount::from_account_info(maker_ta_a).authority(),

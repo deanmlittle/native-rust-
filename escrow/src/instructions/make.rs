@@ -1,9 +1,8 @@
-use crate::{state::Escrow, PDA_MARKER};
 use pinocchio::{
-    account_info::AccountInfo, entrypoint::ProgramResult, instruction::{Seed, Signer}, log, memory::sol_memcpy, msg, program_error::ProgramError, pubkey::Pubkey, sysvars::{rent::Rent, Sysvar}
+    account_info::AccountInfo, entrypoint::ProgramResult, program_error::ProgramError, pubkey::Pubkey
 };
-use pinocchio_system::instructions::CreateAccount;
-use solana_nostd_sha256::hashv;
+
+use crate::state::Escrow;
 
 /// # Make
 ///
@@ -43,48 +42,14 @@ pub fn make(accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
         return Err(ProgramError::NotEnoughAccountKeys);
     };
 
-    // Derive PDA using Hashv
-    let lamports = Rent::get()?.minimum_balance(Escrow::LEN);
-
-    // Assert Escrow address is correct
-    assert_eq!(
-        hashv(&[
-            &data[4..8],
-            maker.key().as_ref(),
-            &[data[0]],
-            crate::ID.as_ref(),
-            PDA_MARKER
-        ]),
-        escrow.key().as_ref()
-    );
-
-    let seed = [data[0]];
-
-    let seeds = [
-        Seed::from(&data[4..8]),
-        Seed::from(maker.key().as_ref()),
-        Seed::from(&seed),
-    ];
-
-    let signer = Signer::from(&seeds);
-
-    CreateAccount {
-        from: maker,
-        to: escrow,
-        lamports,
-        space: Escrow::LEN as u64,
-        owner: &crate::ID,
-    }
-    .invoke_signed(&[signer])?;
-
-    // Copy everything except the maker key
-    unsafe {
-        sol_memcpy(escrow.borrow_mut_data_unchecked(), data, 80);
-    }
-
     // Copy the maker key
     unsafe {
-        *(escrow.borrow_mut_data_unchecked().as_mut_ptr().add(80) as *mut Pubkey) = *maker.key();
+        *(escrow.borrow_mut_data_unchecked().as_mut_ptr() as *mut [u8;32]) = *maker.key();
+    }
+
+    // Copy everything after maker
+    unsafe {
+        *(escrow.borrow_mut_data_unchecked().as_mut_ptr().add(32) as *mut [u8;104]) = *(data.as_ptr() as *const [u8;104]);
     }
 
     Ok(())

@@ -58,8 +58,7 @@ pub fn take(accounts: &[AccountInfo]) -> ProgramResult {
 
     // Derive the signer
     let seeds = [
-        Seed::from(&seed),
-        Seed::from(maker.as_ref()),
+        Seed::from(escrow.key().as_ref()),
         Seed::from(&bump),
     ];
 

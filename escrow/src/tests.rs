@@ -2,7 +2,7 @@
 mod tests {
     use mollusk_svm::{Mollusk, program};
     use solana_sdk::{
-        account::{AccountSharedData, ReadableAccount}, entrypoint::ProgramResult, instruction::{AccountMeta, Instruction}, pubkey::Pubkey
+        account::{AccountSharedData, ReadableAccount}, entrypoint::ProgramResult, instruction::{AccountMeta, Instruction}, pubkey::Pubkey, rent::Rent, sysvar::Sysvar
     };
 
     #[test]
@@ -11,33 +11,31 @@ mod tests {
 
         let mollusk = Mollusk::new(&program_id, "target/deploy/native_escrow");
 
-        let seed: u32 = 1337;
         let maker = Pubkey::new_unique();
+        let escrow = Pubkey::new_unique();
+        let maker_ta_b = Pubkey::new_unique();
         let mint_a = Pubkey::new_unique();
         let mint_b = Pubkey::new_unique();
         
         let (system_program, system_program_account) = program::keyed_account_for_system_program();
 
-        let (escrow, bump) = Pubkey::try_find_program_address(&[&seed.to_le_bytes(), maker.as_ref()], &program_id).unwrap();
-
         let instruction = Instruction::new_with_bytes(
             program_id,
-            &[&[0], &u32::from(bump).to_le_bytes()[..], &seed.to_le_bytes()[..], mint_a.as_ref(), mint_b.as_ref(), &1_000_000u64.to_le_bytes(), &[bump]].concat(),
+            &[maker.as_ref(), maker_ta_b.as_ref(), mint_a.as_ref(), mint_b.as_ref(), &1_000_000u64.to_le_bytes()].concat(),
             vec![
                 AccountMeta::new(maker, true),
-                AccountMeta::new(escrow, false),
+                AccountMeta::new(escrow, false), // It should be a signer because this account shouldn't exist yet
                 AccountMeta::new_readonly(system_program, false)
             ],
         );
 
+        let lamports= mollusk.sysvars.rent.minimum_balance(136);
+
         let result: mollusk_svm::result::InstructionResult = mollusk.process_instruction(
             &instruction,
             &vec![
-                (
-                    maker,
-                    AccountSharedData::new(1_000_000_000, 0, &Pubkey::default()),
-                ),
-                (escrow, AccountSharedData::new(0, 0, &Pubkey::default())),
+                (maker, AccountSharedData::new(1_000_000_000, 0, &Pubkey::default())),
+                (escrow, AccountSharedData::new(lamports, 136, &program_id)),
                 (system_program, system_program_account)
             ],
         );
