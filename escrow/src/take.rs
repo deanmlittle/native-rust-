@@ -35,8 +35,12 @@ pub fn take(_program_id: &Pubkey, accounts: &[AccountInfo], data: &[u8]) -> Prog
     // Check maker_ata_a ownership
     assert_eq!(&TokenAccount::from_account_info(maker_ta_b).authority(), &maker);
 
-    // 
+    // Check vault mint
+    assert_eq!(&TokenAccount::from_account_info(vault).mint(), &mint_a);
 
+    // Check taker_ata_b mint
+    assert_eq!(&TokenAccount::from_account_info(taker_ta_b).mint(), &mint_b);
+    
     // Get vault amount
     let amount_a = TokenAccount::from_account_info(vault).amount();
 
