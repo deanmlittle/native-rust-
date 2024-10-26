@@ -1,7 +1,8 @@
 use pinocchio::{
-    account_info::AccountInfo, entrypoint::ProgramResult, program_error::ProgramError,
-    pubkey::Pubkey,
+    account_info::AccountInfo, entrypoint::ProgramResult, instruction::{Seed, Signer}, program_error::ProgramError, pubkey::Pubkey
 };
+
+use crate::pinocchio_spl::{Transfer, CloseAccount, accounts::TokenAccount};
 
 /// # Take
 ///
@@ -20,26 +21,61 @@ pub fn take(_program_id: &Pubkey, accounts: &[AccountInfo], data: &[u8]) -> Prog
     };
 
     // Cast the maker from the Escrow
-   
     let maker =  unsafe { *(escrow.borrow_data_unchecked().as_ptr().add(8) as *const Pubkey) };
 
+    // Cast the mintA from the Escrow
+    let mint_a =  unsafe { *(escrow.borrow_data_unchecked().as_ptr().add(40) as *const Pubkey) };
+
+    // Cast the mintB from the Escrow
+    let mint_b =  unsafe { *(escrow.borrow_data_unchecked().as_ptr().add(72) as *const Pubkey) };
+
+    // Cast the receive as u64 since we just need to save it in the Escrow
+    let amout_b = unsafe { *(escrow.borrow_data_unchecked().as_ptr().add(104) as *const u64) };
+
     // Check maker_ata_a ownership
-    todo!();
+    assert_eq!(&TokenAccount::from_account_info(maker_ta_b).authority(), &maker);
+
+    // 
 
     // Get vault amount
-    todo!();
+    let amount_a = TokenAccount::from_account_info(vault).amount();
 
-    // Derive the seeds for the PDA
-    let seeds = &[&data[0..7], maker.as_ref(), &[data[8]]];
+    // Cast Seeds as [u8; 8] because we need it in the PDA derivation
+    let seeds = &data[0..7];
+
+    // Cast Bump as u8 since we just need to save it in the Escrow
+    let bump = &[data[8]];
+
+    // Derive the signer
+    let seeds = [
+        Seed::from(seeds),
+        Seed::from(maker.as_ref()),
+        Seed::from(bump),
+    ];
+    let signer = Signer::from(&seeds);
 
     // Transfer out the Funds from the vault to the vault to the taker_ata_a
-    todo!();
+    Transfer {
+        from: vault,
+        to: taker_ta_a,
+        authority: escrow,
+        amount: amount_a,
+    }.invoke_signed(&[signer.clone()])?;
 
     // Close vault
-    todo!();
+    CloseAccount {
+        from: vault,
+        to: taker,
+        authority: escrow,
+    }.invoke_signed(&[signer])?;
 
     // Transfer out the Funds from the vault to the taker_ata_b to the maker_ata_b
-    todo!();
+    Transfer {
+        from: taker_ta_b,
+        to: maker_ta_b,
+        authority: escrow,
+        amount: amout_b,
+    }.invoke()?;
 
     // Close the Escrow account by draining the lamports and setting the data_len to 0
     unsafe {

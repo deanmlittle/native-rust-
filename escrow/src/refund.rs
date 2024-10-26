@@ -18,7 +18,7 @@ use crate::pinocchio_spl::{Transfer, CloseAccount, accounts::TokenAccount};
 /// by setting the 8 bytes before the data (data_len is u64) to 0 to prevent
 /// reinitialization attack
 /// 
-/// * Account Optimization == -1 accounts (system_program)
+/// * Account Optimization == -2 accounts (mint_a, system_program)
 /// 
 /// -- Checks --
 /// + Check that Maker is a signer
@@ -26,7 +26,7 @@ use crate::pinocchio_spl::{Transfer, CloseAccount, accounts::TokenAccount};
 /// - No Check that the Escrow is derived correctly -> Cpi will fail
 pub fn refund(_program_id: &Pubkey, accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
 
-    let [maker, mint_a, maker_ta_a, escrow, vault, token_program] = accounts else {
+    let [maker, maker_ta_a, escrow, vault, _token_program] = accounts else {
         return Err(ProgramError::NotEnoughAccountKeys);
     };
 
