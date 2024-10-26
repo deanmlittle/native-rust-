@@ -1,34 +1,63 @@
+use pinocchio::account_info::AccountInfo;
 use solana_program::pubkey::Pubkey;
 pub struct Mint(*const u8);
 
 impl Mint {
     pub const LEN: usize = 82;
 
-    pub unsafe fn has_mint_authority(&self) -> bool {
-        *(self.0 as *const bool)
+    pub fn from_account_info_unchecked(account_info: &AccountInfo) -> Self {
+        unsafe {
+            Self(account_info.borrow_data_unchecked().as_ptr())
+        }
     }
 
-    pub unsafe fn mint_authority(&self) -> Pubkey {
-        *(self.0.add(4) as *const Pubkey)    
+    pub fn from_account_info(account_info: &AccountInfo) -> Self {
+        assert_eq!(account_info.data_len(), Self::LEN);
+        assert_eq!(account_info.owner(), &crate::pinocchio_spl::ID);
+        unsafe {
+            Self(account_info.borrow_data_unchecked().as_ptr())
+        }
     }
 
-    pub unsafe fn supply(&self) -> u64 {
-        *(self.0.add(36) as *const u64)
+    pub fn has_mint_authority(&self) -> bool {
+        unsafe {
+            *(self.0 as *const bool)
+        }
     }
 
-    pub unsafe fn decimals(&self) -> u8 {
-        *(self.0.add(44) as *const u8)
+    pub fn mint_authority(&self) -> Pubkey {
+        unsafe {
+            *(self.0.add(4) as *const Pubkey)    
+        }
     }
 
-    pub unsafe fn is_frozen(&self) -> bool {
-        *(self.0.add(45) as *const bool)
+    pub fn supply(&self) -> u64 {
+        unsafe {
+            *(self.0.add(36) as *const u64)
+        }
     }
 
-    pub unsafe fn has_freeze_authority(&self) -> bool {
-        *(self.0.add(46) as *const bool)
+    pub fn decimals(&self) -> u8 {
+        unsafe {
+            *(self.0.add(44) as *const u8)
+        }
     }
 
-    pub unsafe fn freeze_authority(&self) -> Pubkey {
-        *(self.0.add(50) as *const Pubkey)
+    pub fn is_frozen(&self) -> bool {
+        unsafe {
+            *(self.0.add(45) as *const bool)
+        }
+    }
+
+    pub fn has_freeze_authority(&self) -> bool {
+        unsafe {
+            *(self.0.add(46) as *const bool)
+        }
+    }
+
+    pub fn freeze_authority(&self) -> Pubkey {
+        unsafe {
+            *(self.0.add(50) as *const Pubkey)
+        }
     }
 }

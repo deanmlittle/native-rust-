@@ -2,7 +2,7 @@ use pinocchio::{
     account_info::AccountInfo, entrypoint::ProgramResult, instruction::{Seed, Signer}, program::invoke_signed, program_error::ProgramError, pubkey::Pubkey
 };
 
-use crate::pinocchio_spl::{Transfer, CloseAccount};
+use crate::pinocchio_spl::{self, accounts::{Mint, TokenAccount}, CloseAccount, Transfer};
 
 /// # Refund
 /// 
@@ -37,7 +37,7 @@ pub fn refund(_program_id: &Pubkey, accounts: &[AccountInfo], data: &[u8]) -> Pr
     assert!(maker.is_signer());
 
     // Check maker_ata_a ownership
-    todo!();
+    let maker_ta_a_account = TokenAccount::from_account_info(maker_ta_a);
 
     // Get vault amount
     todo!();
@@ -52,14 +52,14 @@ pub fn refund(_program_id: &Pubkey, accounts: &[AccountInfo], data: &[u8]) -> Pr
         Seed::from(&[data[8]])
     ];
 
-    let signer = Signer::from(seeds_2);
+    let signer = Signer::from(&seeds_2);
 
     Transfer {
         from: vault,
         to: maker_ta_a,
         authority: escrow,
-        amount: ,
-    }.invoke_signed(&[seeds])?;
+        amount
+    }.invoke_signed(&[signer])?;
 
     // Close vault
     todo!();
