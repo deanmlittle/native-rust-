@@ -27,7 +27,7 @@ use crate::{make, pinocchio_spl::{accounts::TokenAccount, CloseAccount, Transfer
 /// + Check that Maker is a signer
 /// + Check the ownership of maker_ta_a
 /// - No Check that the Escrow is derived correctly -> Cpi will fail
-pub fn refund(accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
+pub fn refund(accounts: &[AccountInfo], bump: [u8;1]) -> ProgramResult {
     let [maker, maker_ta_a, escrow, vault, authority, _token_program] = accounts else {
         return Err(ProgramError::NotEnoughAccountKeys);
     };
@@ -38,9 +38,6 @@ pub fn refund(accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
     // Ensure maker matches escrow maker
     let escrow_account = Escrow::from_account_info(escrow);
     assert_eq!(&escrow_account.maker(), maker.key());
-
-    // Cast Bump as u8 since we just need to save it in the Escrow
-    let bump = [data[0]];
 
     // Derive the signer
     let seeds = [

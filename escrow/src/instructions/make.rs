@@ -1,8 +1,6 @@
 use pinocchio::{
-    account_info::AccountInfo, entrypoint::ProgramResult, msg, program_error::ProgramError, pubkey::Pubkey
+    account_info::AccountInfo, entrypoint::ProgramResult, program_error::ProgramError, pubkey::Pubkey
 };
-
-use crate::state::Escrow;
 
 /// # Make
 ///
@@ -46,9 +44,8 @@ pub fn make(accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
     unsafe { 
         *(escrow.borrow_mut_data_unchecked().as_mut_ptr() as *mut Pubkey) = *maker.key()
     };
-    
 
-    // Copy everything after maker
+    // Copy everything after maker from our IX data
     unsafe {
         *(escrow.borrow_mut_data_unchecked().as_mut_ptr().add(32) as *mut [u8;104]) = *(data.as_ptr() as *const [u8;104]);
     }

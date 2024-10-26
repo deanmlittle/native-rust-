@@ -18,7 +18,7 @@ use crate::pinocchio_spl::{accounts::TokenAccount, CloseAccount, Transfer};
 ///
 /// -- Instruction Checks --
 
-pub fn take(accounts: &[AccountInfo]) -> ProgramResult {
+pub fn take(accounts: &[AccountInfo], bump: [u8;1]) -> ProgramResult {
     let [taker, taker_ta_a, taker_ta_b, maker_ta_b, escrow, vault, _token_program] = accounts else {
         return Err(ProgramError::NotEnoughAccountKeys);
     };
