@@ -1,18 +1,18 @@
-use make::make;
+mod instructions;
+use instructions::*;
+mod state;
+mod pinocchio_spl;
+
 use pinocchio::account_info::AccountInfo;
 use pinocchio::entrypoint;
 use pinocchio::pubkey::Pubkey;
 use pinocchio::{entrypoint::ProgramResult, program_error::ProgramError};
-
-mod instructions;
-use instructions::*;
-use refund::refund;
+use make::make;
 use take::take;
-mod make;
-mod pinocchio_spl;
-mod refund;
-mod state;
-mod take;
+use refund::refund;
+
+#[cfg(test)]
+mod tests;
 
 entrypoint!(process_instruction);
 
@@ -22,7 +22,7 @@ pub const ID: [u8; 32] =
     five8_const::decode_32_const("22222222222222222222222222222222222222222222");
 
 fn process_instruction(
-    program_id: &Pubkey,
+    _program_id: &Pubkey,
     accounts: &[AccountInfo],
     instruction_data: &[u8],
 ) -> ProgramResult {
