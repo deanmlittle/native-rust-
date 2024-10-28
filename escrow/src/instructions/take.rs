@@ -3,6 +3,7 @@ use pinocchio::{
     entrypoint::ProgramResult,
     instruction::{Seed, Signer},
     program_error::ProgramError,
+    pubkey::Pubkey,
 };
 
 use crate::state::Escrow;
@@ -50,7 +51,7 @@ use crate::pinocchio_spl::{accounts::TokenAccount, CloseAccount, Transfer};
 /// + Check that the maker_ta_b is the same as the one saved in the Escrow
 
 pub fn take(accounts: &[AccountInfo], bump: [u8;1]) -> ProgramResult {
-    let [taker, taker_ta_a, taker_ta_b, maker_ta_b, escrow, vault, _token_program] = accounts else {
+    let [taker, taker_ta_a, taker_ta_b, maker_ta_b, escrow, vault, authority, _token_program] = accounts else {
         return Err(ProgramError::NotEnoughAccountKeys);
     };
 
@@ -70,7 +71,7 @@ pub fn take(accounts: &[AccountInfo], bump: [u8;1]) -> ProgramResult {
     Transfer {
         from: taker_ta_b,
         to: maker_ta_b,
-        authority: escrow,
+        authority: taker,
         amount: escrow_account.amount_b(),
     }
     .invoke()?;
@@ -86,7 +87,7 @@ pub fn take(accounts: &[AccountInfo], bump: [u8;1]) -> ProgramResult {
     Transfer {
         from: vault,
         to: taker_ta_a,
-        authority: escrow,
+        authority,
         amount: TokenAccount::from_account_info(vault).amount(),
     }
     .invoke_signed(&signer.clone())?;
@@ -95,15 +96,16 @@ pub fn take(accounts: &[AccountInfo], bump: [u8;1]) -> ProgramResult {
     CloseAccount {
         from: vault,
         to: taker,
-        authority: escrow,
+        authority,
     }
     .invoke_signed(&signer.clone())?;
 
     // Close the Escrow account by draining the lamports and setting the data_len to 0
     unsafe {
-        let lamports = escrow.borrow_lamports_unchecked();
-        *escrow.borrow_mut_lamports_unchecked() -= lamports;
-        *taker.borrow_mut_lamports_unchecked() += lamports;
+        *taker.borrow_mut_lamports_unchecked() += *escrow.borrow_lamports_unchecked();
+        *escrow.borrow_mut_lamports_unchecked() = 0;
+
+        escrow.assign(&Pubkey::default());
 
         *(escrow.borrow_mut_data_unchecked().as_mut_ptr().sub(8) as *mut u64) = 0;
     }
