@@ -1,5 +1,17 @@
 use pinocchio::{account_info::AccountInfo, pubkey::Pubkey};
 
+/// # State
+///
+/// -- Data --
+/// > Maker: Pubkey
+/// > MakerTaB: Pubkey
+/// > MintA: Pubkey
+/// > MintB: Pubkey
+/// > AmountB: u64
+/// 
+/// -- Data Logic --
+/// [...]
+/// 
 pub struct Escrow(*const u8);
 
 impl Escrow {
@@ -19,7 +31,7 @@ impl Escrow {
         unsafe { *(self.0 as *const Pubkey) }
     }
 
-    pub fn maker_ata_b(&self) -> Pubkey {
+    pub fn maker_ta_b(&self) -> Pubkey {
         unsafe { *(self.0.add(32) as *const Pubkey) }
     }
 
@@ -31,7 +43,7 @@ impl Escrow {
         unsafe { *(self.0.add(96) as *const Pubkey) }
     }
 
-    pub fn amount_b(&self) -> Pubkey {
-        unsafe { *(self.0.add(128) as *const Pubkey) }
+    pub fn amount_b(&self) -> u64 {
+        unsafe { *(self.0.add(128) as *const u64) }
     }
 }

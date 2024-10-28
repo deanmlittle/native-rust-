@@ -1326,8 +1326,7 @@ dependencies = [
 [[package]]
 name = "mollusk-svm"
 version = "0.0.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "199afcf537854f5e00c19488ec0d09842cdeb3d9e390789785e4dacae05ff4bd"
+source = "git+https://github.com/buffalojoec/mollusk.git#6810892b26ac39feebe441c5f3d2daa8f6ba6735"
 dependencies = [
  "bincode",
  "solana-bpf-loader-program",
@@ -1351,6 +1350,7 @@ dependencies = [
  "solana-nostd-sha256",
  "solana-program",
  "solana-sdk",
+ "spl-token",
 ]
 
 [[package]]
@@ -2387,6 +2387,21 @@ name = "spin"
 version = "0.9.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6980e8d7511241f8acf4aebddbb1ff938df5eebe98691418c4468d0b72a96a67"
+
+[[package]]
+name = "spl-token"
+version = "6.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "70a0f06ac7f23dc0984931b1fe309468f14ea58e32660439c1cef19456f5d0e3"
+dependencies = [
+ "arrayref",
+ "bytemuck",
+ "num-derive",
+ "num-traits",
+ "num_enum",
+ "solana-program",
+ "thiserror",
+]
 
 [[package]]
 name = "strsim"
