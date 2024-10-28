@@ -5,28 +5,41 @@ use pinocchio::{
     program_error::ProgramError,
 };
 
-use crate::{make, pinocchio_spl::{accounts::TokenAccount, CloseAccount, Transfer}, state::Escrow};
+use crate::{pinocchio_spl::{accounts::TokenAccount, CloseAccount, Transfer}, state::Escrow};
 
 /// # Refund
 ///
 /// -- Data scheme --
-/// > Seed [u8; 8]
-/// > Bump [u8; 1]
+/// > bump [u8; 1]
+/// 
+/// -- Instruction Logic --
+/// We introduce an authority account (that is the owner of the Vault), that has 
+/// defined Seeds derived from the Escrow PublicKey and this authority will be used 
+/// to sign the CPIs that are going to transfer the funds back to the maker_ta_a and
+/// closing the vault Token Account.
+/// 
+/// Using the authority account permits to skip on a CPI for the creation of the TA 
+/// as owner of itself since it's a system account with deterministc seeds.
+/// 
+/// We created a new macro to deserialize the Token Account using pointers and unsafe
+/// operation to optimize grabbing the amount of token inside of it:
+/// `TokenAccount::from_account_info_unchecked(vault).amount()`
+/// 
+/// Then we close the Escrow account by draining all the lamports and setting the data_len 
+/// to 0 (data_len starts 8 bytes before the actual data of the account) to prevent
+/// reinitalization attack.
+/// 
+/// -- Client Side Logic --
+/// Derive the authority account from the Escrow PublicKey and pass in the bump.
 ///
-/// -- Account & Instruction Optimization --
-/// We don't need the System program since we're not creating accounts
-/// and we're draining the lamports `borrow_mut_lamports_unchecked`
-///
-/// To close the account we drain all the lamports and set the data_len to 0
-/// by setting the 8 bytes before the data (data_len is u64) to 0 to prevent
-/// reinitialization attack
-///
-/// * Account Optimization == -2 accounts (mint_a, system_program)
+/// -- Account Optimization Logic --
+/// - 2 accounts from the Anchor Escrow (mint_a, system_program)
+/// + 1 account from the Anchor Escrow (authority)
 ///
 /// -- Checks --
-/// + Check that Maker is a signer
-/// + Check the ownership of maker_ta_a
-/// - No Check that the Escrow is derived correctly -> Cpi will fail
+/// + Check that Maker is a signer (since it's the owner of the tokens in the Vault)
+/// + Check the ownership of maker_ta_a (since we're transferring the funds to it)
+
 pub fn refund(accounts: &[AccountInfo], bump: [u8;1]) -> ProgramResult {
     let [maker, maker_ta_a, escrow, vault, authority, _token_program] = accounts else {
         return Err(ProgramError::NotEnoughAccountKeys);
