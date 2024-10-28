@@ -51,7 +51,7 @@ impl<'a> Transfer<'a> {
             let ptr = instruction_data.as_mut_ptr() as *mut u8;
 
             // Write 3 as u32 to the first 4 bytes
-            *(ptr as *mut u8) = 3;
+            *ptr = 3;
 
             // Write self.amount as u64 to the next 8 bytes
             *(ptr.add(1) as *mut u64) = self.amount;

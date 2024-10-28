@@ -3,9 +3,7 @@ use pinocchio::{account_info::AccountInfo, pubkey::Pubkey};
 
 pub struct TokenAccount(*const u8);
 
-pub struct Token {
-    
-}
+pub struct Token {}
 
 impl TokenAccount {
     pub const LEN: usize = 165;

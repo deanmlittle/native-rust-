@@ -1,4 +1,6 @@
-pub const ID: [u8; 32] = five8_const::decode_32_const("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
+#![allow(unused)]
+pub const ID: [u8; 32] =
+    five8_const::decode_32_const("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
 
 pub mod transfer;
 pub use transfer::*;

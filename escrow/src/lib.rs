@@ -1,15 +1,15 @@
 mod instructions;
 use instructions::*;
-mod state;
 mod pinocchio_spl;
+mod state;
 
+use make::make;
 use pinocchio::account_info::AccountInfo;
 use pinocchio::entrypoint;
 use pinocchio::pubkey::Pubkey;
 use pinocchio::{entrypoint::ProgramResult, program_error::ProgramError};
-use make::make;
-use take::take;
 use refund::refund;
+use take::take;
 
 mod tests;
 
