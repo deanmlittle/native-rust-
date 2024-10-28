@@ -2,7 +2,7 @@ use pinocchio::{
     account_info::AccountInfo,
     entrypoint::ProgramResult,
     instruction::{Seed, Signer},
-    program_error::ProgramError,
+    program_error::ProgramError, pubkey::Pubkey,
 };
 
 use crate::{pinocchio_spl::{accounts::TokenAccount, CloseAccount, Transfer}, state::Escrow};
@@ -80,6 +80,9 @@ pub fn refund(accounts: &[AccountInfo], bump: [u8;1]) -> ProgramResult {
     unsafe {
         *maker.borrow_mut_lamports_unchecked() += *escrow.borrow_lamports_unchecked();
         *escrow.borrow_mut_lamports_unchecked() = 0;
+
+        escrow.assign(&Pubkey::default());
+
         *(escrow.borrow_mut_data_unchecked().as_mut_ptr().sub(8) as *mut u64) = 0;
     }
 
