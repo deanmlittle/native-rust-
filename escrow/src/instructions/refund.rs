@@ -68,12 +68,12 @@ pub fn refund(accounts: &[AccountInfo], bump: [u8;1]) -> ProgramResult {
     // .invoke_signed(&signer)?;
 
     // Close vault
-    // CloseAccount {
-    //     from: vault,
-    //     to: maker,
-    //     authority: escrow,
-    // }
-    // .invoke_signed(&signer)?;
+    CloseAccount {
+        from: vault,
+        to: maker,
+        authority,
+    }
+    .invoke_signed(&signer)?;
 
     // Close the Escrow account by draining the lamports and setting the data_len to 0
     unsafe {

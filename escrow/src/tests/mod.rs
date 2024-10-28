@@ -121,7 +121,7 @@ mod tests {
             spl_token::state::Account {
                 mint: mint_a,
                 owner: authority,
-                amount: 0,
+                amount: 1_000_000,
                 delegate: COption::None,
                 state: AccountState::Initialized,
                 is_native: COption::None,
@@ -159,9 +159,9 @@ mod tests {
                 AccountMeta::new(maker_ta_a, false),
                 AccountMeta::new(escrow, false),
                 AccountMeta::new(vault, false),
-                AccountMeta::new_readonly(authority, false),
-                AccountMeta::new_readonly(token_program, false),
-                AccountMeta::new_readonly(system_program, false),
+                AccountMeta::new(authority, true),
+                AccountMeta::new(token_program, false),
+                AccountMeta::new(system_program, false),
             ],
         );
 
