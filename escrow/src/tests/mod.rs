@@ -94,7 +94,10 @@ mod tests {
         ).unwrap();
 
         let mut maker_ta_a_account = AccountSharedData::new(
-            u64::MAX,
+            mollusk
+                .sysvars
+                .rent
+                .minimum_balance(spl_token::state::Account::LEN),
             spl_token::state::Account::LEN,
             &token_program,
         );
@@ -113,7 +116,10 @@ mod tests {
         ).unwrap();
 
         let mut vault_account = AccountSharedData::new(
-            u64::MAX,
+            mollusk
+                .sysvars
+                .rent
+                .minimum_balance(spl_token::state::Account::LEN),
             spl_token::state::Account::LEN,
             &token_program,
         );
@@ -121,7 +127,7 @@ mod tests {
             spl_token::state::Account {
                 mint: mint_a,
                 owner: authority,
-                amount: 1_000_000,
+                amount: 0,
                 delegate: COption::None,
                 state: AccountState::Initialized,
                 is_native: COption::None,

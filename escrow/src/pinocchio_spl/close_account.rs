@@ -39,7 +39,7 @@ impl<'a> CloseAccount<'a> {
         let instruction = Instruction {
             program_id: &super::ID,
             accounts: &account_metas,
-            data: &[],
+            data: &[9],
         };
 
         invoke_signed(&instruction, &[self.from, self.to, self.authority], signers)
