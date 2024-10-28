@@ -3,19 +3,18 @@ mod tests {
     use std::{mem, u64};
 
     use mollusk_svm::{
-        program::{self, program_account},
+        program::{self, create_program_account_loader_v3},
         Mollusk,
     };
 
     use solana_sdk::{
-        account::{AccountSharedData, WritableAccount}, instruction::{AccountMeta, Instruction}, program_option::COption, program_pack::Pack, pubkey::Pubkey,
+        account::{AccountSharedData, WritableAccount}, instruction::{AccountMeta, Instruction}, program_option::COption, program_pack::Pack, pubkey::Pubkey, system_program,
     };
     use spl_token::state::AccountState;
 
     use crate::state::Escrow;
 
     #[test]
-    #[ignore = "This works"]
     fn make() {
         let program_id = Pubkey::new_from_array(five8_const::decode_32_const("22222222222222222222222222222222222222222222"));
 
@@ -59,7 +58,11 @@ mod tests {
     fn refund() {
         let program_id = Pubkey::new_from_array(five8_const::decode_32_const("22222222222222222222222222222222222222222222"));
 
-        let mollusk = Mollusk::new(&program_id, "target/deploy/native_escrow");
+        let mut mollusk = Mollusk::new(&program_id, "target/deploy/native_escrow");
+
+        mollusk.add_program(&spl_token::ID, "src/spl_token-3.5.0", &mollusk_svm::program::loader_keys::LOADER_V3);
+        let (token_program, token_program_account) = (spl_token::ID, program::create_program_account_loader_v3(&spl_token::ID));
+        let (system_program, system_program_account) = program::keyed_account_for_system_program();
 
         // Accounts
         let maker = Pubkey::new_unique();
@@ -72,9 +75,6 @@ mod tests {
         let maker_ta_b = Pubkey::new_unique();
         let mint_b = Pubkey::new_unique();
        
-        let (system_program, system_program_account) = program::keyed_account_for_system_program();
-        let (token_program, token_program_account) = (spl_token::ID, program_account(&spl_token::ID));
-
         // Fill out our account data
         let mut mint_a_account = AccountSharedData::new(
             u64::MAX,
