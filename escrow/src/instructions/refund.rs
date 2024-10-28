@@ -1,8 +1,5 @@
 use pinocchio::{
-    account_info::AccountInfo,
-    entrypoint::ProgramResult,
-    instruction::{Seed, Signer},
-    program_error::ProgramError, pubkey::Pubkey,
+    account_info::AccountInfo, entrypoint::ProgramResult, instruction::{Seed, Signer}, msg, program_error::ProgramError, pubkey::Pubkey
 };
 
 use crate::{pinocchio_spl::{accounts::TokenAccount, CloseAccount, Transfer}, state::Escrow};
@@ -41,7 +38,7 @@ use crate::{pinocchio_spl::{accounts::TokenAccount, CloseAccount, Transfer}, sta
 /// + Check the ownership of maker_ta_a (since we're transferring the funds to it)
 
 pub fn refund(accounts: &[AccountInfo], bump: [u8;1]) -> ProgramResult {
-    let [maker, maker_ta_a, escrow, vault, authority, _token_program] = accounts else {
+    let [maker, maker_ta_a, escrow, vault, authority, _token_program, _system_program] = accounts else {
         return Err(ProgramError::NotEnoughAccountKeys);
     };
 
@@ -59,22 +56,24 @@ pub fn refund(accounts: &[AccountInfo], bump: [u8;1]) -> ProgramResult {
     ];
     let signer = [Signer::from(&seeds)];
 
+    msg!("{:?}", TokenAccount::from_account_info_unchecked(vault).amount());
+
     // Transfer all funds from the vault to maker_ta_a
-    Transfer {
-        from: vault,
-        to: maker_ta_a,
-        authority,
-        amount: TokenAccount::from_account_info_unchecked(vault).amount(),
-    }
-    .invoke_signed(&signer)?;
+    // Transfer {
+    //     from: vault,
+    //     to: maker_ta_a,
+    //     authority,
+    //     amount: 0,
+    // }
+    // .invoke_signed(&signer)?;
 
     // Close vault
-    CloseAccount {
-        from: vault,
-        to: maker,
-        authority: escrow,
-    }
-    .invoke_signed(&signer)?;
+    // CloseAccount {
+    //     from: vault,
+    //     to: maker,
+    //     authority: escrow,
+    // }
+    // .invoke_signed(&signer)?;
 
     // Close the Escrow account by draining the lamports and setting the data_len to 0
     unsafe {

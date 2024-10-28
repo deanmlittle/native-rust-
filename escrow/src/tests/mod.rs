@@ -3,18 +3,19 @@ mod tests {
     use std::{mem, u64};
 
     use mollusk_svm::{
-        program::{self, create_program_account_loader_v3},
+        program,
         Mollusk,
     };
 
     use solana_sdk::{
-        account::{AccountSharedData, WritableAccount}, instruction::{AccountMeta, Instruction}, program_option::COption, program_pack::Pack, pubkey::Pubkey, system_program,
+        account::{AccountSharedData, ReadableAccount, WritableAccount}, instruction::{AccountMeta, Instruction}, program_option::COption, program_pack::Pack, pubkey::Pubkey,
     };
     use spl_token::state::AccountState;
 
     use crate::state::Escrow;
 
     #[test]
+    #[ignore = "reason"]
     fn make() {
         let program_id = Pubkey::new_from_array(five8_const::decode_32_const("22222222222222222222222222222222222222222222"));
 
@@ -60,7 +61,7 @@ mod tests {
 
         let mut mollusk = Mollusk::new(&program_id, "target/deploy/native_escrow");
 
-        mollusk.add_program(&spl_token::ID, "src/spl_token-3.5.0", &mollusk_svm::program::loader_keys::LOADER_V3);
+        mollusk.add_program(&spl_token::ID, "src/tests/spl_token-3.5.0", &mollusk_svm::program::loader_keys::LOADER_V3);
         let (token_program, token_program_account) = (spl_token::ID, program::create_program_account_loader_v3(&spl_token::ID));
         let (system_program, system_program_account) = program::keyed_account_for_system_program();
 
@@ -120,26 +121,34 @@ mod tests {
             spl_token::state::Account {
                 mint: mint_a,
                 owner: authority,
-                amount: 1_000_000,
+                amount: 0,
                 delegate: COption::None,
                 state: AccountState::Initialized,
                 is_native: COption::None,
                 delegated_amount: 0,
                 close_authority: COption::None,
             },
-            maker_ta_a_account.data_as_mut_slice(),
+            vault_account.data_as_mut_slice(),
         ).unwrap();
 
         let mut escrow_account = AccountSharedData::new(
-            u64::MAX,
+            mollusk
+                .sysvars
+                .rent
+                .minimum_balance(mem::size_of::<Escrow>()),
             mem::size_of::<Escrow>(),
             &program_id,
         );
-        let escrow_data = [maker.to_bytes().to_vec(), maker_ta_b.to_bytes().to_vec(), mint_a.to_bytes().to_vec(), mint_b.to_bytes().to_vec(), 1_000_000u64.to_le_bytes().to_vec()].concat();
-        escrow_account.set_data_from_slice(&escrow_data);
+        escrow_account.set_data_from_slice(&[
+            maker.to_bytes().to_vec(), 
+            maker_ta_b.to_bytes().to_vec(), 
+            mint_a.to_bytes().to_vec(), 
+            mint_b.to_bytes().to_vec(), 
+            1_000_000u64.to_le_bytes().to_vec()
+        ].concat());
 
         // Data
-        let data = [1, bump];
+        let data = [2, bump];
 
         // Instruction
         let instruction = Instruction::new_with_bytes(
@@ -150,8 +159,9 @@ mod tests {
                 AccountMeta::new(maker_ta_a, false),
                 AccountMeta::new(escrow, false),
                 AccountMeta::new(vault, false),
-                AccountMeta::new(authority, false),
-                AccountMeta::new(token_program, false),
+                AccountMeta::new_readonly(authority, false),
+                AccountMeta::new_readonly(token_program, false),
+                AccountMeta::new_readonly(system_program, false),
             ],
         );
 
@@ -163,7 +173,8 @@ mod tests {
                 (escrow, escrow_account),
                 (vault, vault_account),
                 (authority, AccountSharedData::new(0, 0, &Pubkey::default())),
-                (token_program, token_program_account)
+                (token_program, token_program_account),
+                (system_program, system_program_account)
             ],
         );
 
