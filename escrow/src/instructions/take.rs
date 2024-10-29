@@ -2,8 +2,7 @@ use pinocchio::{
     account_info::AccountInfo,
     entrypoint::ProgramResult,
     instruction::{Seed, Signer},
-    program_error::ProgramError,
-    pubkey::Pubkey,
+    program_error::ProgramError
 };
 
 use crate::state::Escrow;
@@ -60,10 +59,10 @@ pub fn take(accounts: &[AccountInfo], bump: [u8; 1]) -> ProgramResult {
     // Get the escrow_account data for future checks
     let escrow_account = Escrow::from_account_info(escrow);
 
-    // Check maker_ata_a ownership
+    // Check maker_ata_b matches our escrow account
     assert_eq!(
-        &TokenAccount::from_account_info(maker_ta_b).authority(),
-        &escrow_account.maker()
+        maker_ta_b.key(),
+        &escrow_account.maker_ta_b()
     );
 
     // Check vault mint
@@ -71,9 +70,6 @@ pub fn take(accounts: &[AccountInfo], bump: [u8; 1]) -> ProgramResult {
         &TokenAccount::from_account_info(vault).mint(),
         &escrow_account.mint_a()
     );
-
-    // Check maker_ata_b mint
-    assert_eq!(maker_ta_b.key(), &escrow_account.maker_ta_b());
 
     // Transfer out the Funds from the vault to the taker_ata_b to the maker_ata_b
     Transfer {
@@ -109,8 +105,6 @@ pub fn take(accounts: &[AccountInfo], bump: [u8; 1]) -> ProgramResult {
     unsafe {
         *taker.borrow_mut_lamports_unchecked() += *escrow.borrow_lamports_unchecked();
         *escrow.borrow_mut_lamports_unchecked() = 0;
-
-        escrow.assign(&Pubkey::default());
 
         *(escrow.borrow_mut_data_unchecked().as_mut_ptr().sub(8) as *mut u64) = 0;
     }

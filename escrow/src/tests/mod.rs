@@ -105,7 +105,7 @@ mod tests {
             spl_token::state::Mint::LEN,
             &token_program,
         );
-        solana_program::program_pack::Pack::pack(
+        solana_sdk::program_pack::Pack::pack(
             spl_token::state::Mint {
                 mint_authority: COption::None,
                 supply: 100_000_000_000,
@@ -125,7 +125,7 @@ mod tests {
             spl_token::state::Account::LEN,
             &token_program,
         );
-        solana_program::program_pack::Pack::pack(
+        solana_sdk::program_pack::Pack::pack(
             spl_token::state::Account {
                 mint: mint_a,
                 owner: maker,
@@ -148,7 +148,7 @@ mod tests {
             spl_token::state::Account::LEN,
             &token_program,
         );
-        solana_program::program_pack::Pack::pack(
+        solana_sdk::program_pack::Pack::pack(
             spl_token::state::Account {
                 mint: mint_a,
                 owner: authority,
@@ -257,7 +257,7 @@ mod tests {
             spl_token::state::Mint::LEN,
             &token_program,
         );
-        solana_program::program_pack::Pack::pack(
+        solana_sdk::program_pack::Pack::pack(
             spl_token::state::Mint {
                 mint_authority: COption::None,
                 supply: 100_000_000_000,
@@ -277,7 +277,7 @@ mod tests {
             spl_token::state::Mint::LEN,
             &token_program,
         );
-        solana_program::program_pack::Pack::pack(
+        solana_sdk::program_pack::Pack::pack(
             spl_token::state::Mint {
                 mint_authority: COption::None,
                 supply: 100_000_000_000,
@@ -297,7 +297,7 @@ mod tests {
             spl_token::state::Account::LEN,
             &token_program,
         );
-        solana_program::program_pack::Pack::pack(
+        solana_sdk::program_pack::Pack::pack(
             spl_token::state::Account {
                 mint: mint_a,
                 owner: taker,
@@ -320,7 +320,7 @@ mod tests {
             spl_token::state::Account::LEN,
             &token_program,
         );
-        solana_program::program_pack::Pack::pack(
+        solana_sdk::program_pack::Pack::pack(
             spl_token::state::Account {
                 mint: mint_b,
                 owner: taker,
@@ -343,7 +343,7 @@ mod tests {
             spl_token::state::Account::LEN,
             &token_program,
         );
-        solana_program::program_pack::Pack::pack(
+        solana_sdk::program_pack::Pack::pack(
             spl_token::state::Account {
                 mint: mint_b,
                 owner: maker,
@@ -366,7 +366,7 @@ mod tests {
             spl_token::state::Account::LEN,
             &token_program,
         );
-        solana_program::program_pack::Pack::pack(
+        solana_sdk::program_pack::Pack::pack(
             spl_token::state::Account {
                 mint: mint_a,
                 owner: authority,

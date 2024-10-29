@@ -2,7 +2,6 @@ use pinocchio::{
     account_info::AccountInfo,
     entrypoint::ProgramResult,
     instruction::{Seed, Signer},
-    msg,
     program_error::ProgramError,
     pubkey::Pubkey,
 };
@@ -71,11 +70,6 @@ pub fn refund(accounts: &[AccountInfo], bump: [u8; 1]) -> ProgramResult {
         amount,
     }
     .invoke_signed(&signer)?;
-
-    msg!(
-        "{:?}",
-        TokenAccount::from_account_info_unchecked(vault).amount()
-    );
 
     // Close vault
     CloseAccount {
