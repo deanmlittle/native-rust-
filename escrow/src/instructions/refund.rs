@@ -1,9 +1,9 @@
 use pinocchio::{
     account_info::AccountInfo,
-    entrypoint::ProgramResult,
     instruction::{Seed, Signer},
     program_error::ProgramError,
     pubkey::Pubkey,
+    ProgramResult,
 };
 
 use crate::{

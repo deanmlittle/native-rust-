@@ -1,8 +1,8 @@
 use pinocchio::{
     account_info::AccountInfo,
-    entrypoint::ProgramResult,
     instruction::{Seed, Signer},
-    program_error::ProgramError
+    program_error::ProgramError,
+    ProgramResult,
 };
 
 use crate::state::Escrow;
@@ -60,10 +60,7 @@ pub fn take(accounts: &[AccountInfo], bump: [u8; 1]) -> ProgramResult {
     let escrow_account = Escrow::from_account_info(escrow);
 
     // Check maker_ata_b matches our escrow account
-    assert_eq!(
-        maker_ta_b.key(),
-        &escrow_account.maker_ta_b()
-    );
+    assert_eq!(maker_ta_b.key(), &escrow_account.maker_ta_b());
 
     // Check vault mint
     assert_eq!(
