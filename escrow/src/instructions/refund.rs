@@ -6,10 +6,9 @@ use pinocchio::{
     ProgramResult,
 };
 
-use crate::{
-    pinocchio_spl::{accounts::TokenAccount, CloseAccount, Transfer},
-    state::Escrow,
-};
+use pinocchio_token::{instructions::{CloseAccount, Transfer}, state::TokenAccount};
+
+use crate::state::Escrow;
 
 /// # Refund
 ///
@@ -73,8 +72,8 @@ pub fn refund(accounts: &[AccountInfo], bump: [u8; 1]) -> ProgramResult {
 
     // Close vault
     CloseAccount {
-        from: vault,
-        to: maker,
+        account: vault,
+        destination: maker,
         authority,
     }
     .invoke_signed(&signer)?;

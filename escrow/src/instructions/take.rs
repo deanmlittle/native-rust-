@@ -4,10 +4,11 @@ use pinocchio::{
     program_error::ProgramError,
     ProgramResult,
 };
+use pinocchio_token::{instructions::{CloseAccount, Transfer}, state::TokenAccount};
 
 use crate::state::Escrow;
 
-use crate::pinocchio_spl::{accounts::TokenAccount, CloseAccount, Transfer};
+// use pinocchio_spl::{accounts::TokenAccount, CloseAccount, Transfer};
 
 /// # Take
 ///
@@ -92,8 +93,8 @@ pub fn take(accounts: &[AccountInfo], bump: [u8; 1]) -> ProgramResult {
 
     // Close vault
     CloseAccount {
-        from: vault,
-        to: taker,
+        account: vault,
+        destination: taker,
         authority,
     }
     .invoke_signed(&signer.clone())?;

@@ -1346,8 +1346,9 @@ dependencies = [
  "five8",
  "five8_const",
  "mollusk-svm",
- "pinocchio 0.6.0",
+ "pinocchio",
  "pinocchio-system",
+ "pinocchio-token",
  "solana-nostd-sha256",
  "solana-sdk",
  "spl-token",
@@ -1559,33 +1560,33 @@ checksum = "8b870d8c151b6f2fb93e84a13146138f05d02ed11c7e7c54f8826aaaf7c9f184"
 
 [[package]]
 name = "pinocchio"
-version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3be4a14e72d9098d35310de70667d5af8d7fc249ab8e26c54725f955c2dbd074"
-
-[[package]]
-name = "pinocchio"
 version = "0.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c9f716de2190437efa787dd7414f4bcea88d22c2f81bbeecabb7db6d9cc326bd"
+source = "git+https://github.com/L0STE/pinocchio/?branch=spl-token#55d47bbdef7c951306f454eb8d77e5f81bc9a12c"
 
 [[package]]
 name = "pinocchio-pubkey"
 version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b4800103b9bea24df2e78f161403fc8f8c2286cb5f874b2e5feebe6c5c4fb35a"
+source = "git+https://github.com/L0STE/pinocchio/?branch=spl-token#55d47bbdef7c951306f454eb8d77e5f81bc9a12c"
 dependencies = [
  "five8_const",
- "pinocchio 0.5.0",
+ "pinocchio",
 ]
 
 [[package]]
 name = "pinocchio-system"
 version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c6a50555b55fde54156049064cc503219068ee53ecd4add7014ec928ee21f67f"
+source = "git+https://github.com/L0STE/pinocchio/?branch=spl-token#55d47bbdef7c951306f454eb8d77e5f81bc9a12c"
 dependencies = [
- "pinocchio 0.6.0",
+ "pinocchio",
+ "pinocchio-pubkey",
+]
+
+[[package]]
+name = "pinocchio-token"
+version = "0.1.0"
+source = "git+https://github.com/L0STE/pinocchio/?branch=spl-token#55d47bbdef7c951306f454eb8d77e5f81bc9a12c"
+dependencies = [
+ "pinocchio",
  "pinocchio-pubkey",
 ]
 
