@@ -784,15 +784,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "835a3dc7d1ec9e75e2b5fb4ba75396837112d2060b03f7d43bc1897c7f7211da"
 
 [[package]]
-name = "five8"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a75b8549488b4715defcb0d8a8a1c1c76a80661b5fa106b4ca0e7fce59d7d875"
-dependencies = [
- "five8_core",
-]
-
-[[package]]
 name = "five8_const"
 version = "0.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1326,8 +1317,7 @@ dependencies = [
 [[package]]
 name = "mollusk-svm"
 version = "0.0.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "199afcf537854f5e00c19488ec0d09842cdeb3d9e390789785e4dacae05ff4bd"
+source = "git+https://github.com/deanmlittle/mollusk#94ffb3511f72866cd20ce87d179a001082ce215e"
 dependencies = [
  "bincode",
  "solana-bpf-loader-program",
@@ -1342,7 +1332,7 @@ dependencies = [
 [[package]]
 name = "mollusk-token"
 version = "0.1.0"
-source = "git+https://github.com/deanmlittle/mollusk-token#cfb9ede113488d45a3c6d55d7657fbef600979e4"
+source = "git+https://github.com/deanmlittle/mollusk#94ffb3511f72866cd20ce87d179a001082ce215e"
 dependencies = [
  "mollusk-svm",
  "solana-sdk",
@@ -1352,7 +1342,6 @@ dependencies = [
 name = "native-escrow"
 version = "0.1.0"
 dependencies = [
- "five8",
  "five8_const",
  "mollusk-svm",
  "mollusk-token",
