@@ -16,5 +16,6 @@ five8 = "0.2.1"
 
 [dev-dependencies]
 mollusk-svm = "0.0.6"
-solana-sdk = "2.0.14"
+mollusk-token = { git = "https://github.com/deanmlittle/mollusk-token" }
+solana-sdk = "2.0.8"
 spl-token = "6.0.0"

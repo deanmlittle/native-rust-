@@ -1340,12 +1340,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "mollusk-token"
+version = "0.1.0"
+source = "git+https://github.com/deanmlittle/mollusk-token#cfb9ede113488d45a3c6d55d7657fbef600979e4"
+dependencies = [
+ "mollusk-svm",
+ "solana-sdk",
+]
+
+[[package]]
 name = "native-escrow"
 version = "0.1.0"
 dependencies = [
  "five8",
  "five8_const",
  "mollusk-svm",
+ "mollusk-token",
  "pinocchio",
  "pinocchio-system",
  "pinocchio-token",
@@ -1942,9 +1952,9 @@ checksum = "61697e0a1c7e512e84a621326239844a24d8207b4669b41bc18b32ea5cbf988b"
 
 [[package]]
 name = "serde"
-version = "1.0.213"
+version = "1.0.214"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3ea7893ff5e2466df8d720bb615088341b295f849602c6956047f8f80f0e9bc1"
+checksum = "f55c3193aca71c12ad7890f1785d2b73e1b9f63a0bbc353c08ef26fe03fc56b5"
 dependencies = [
  "serde_derive",
 ]
@@ -1960,9 +1970,9 @@ dependencies = [
 
 [[package]]
 name = "serde_derive"
-version = "1.0.213"
+version = "1.0.214"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7e85ad2009c50b58e87caa8cd6dac16bdf511bbfb7af6c33df902396aa480fa5"
+checksum = "de523f781f095e28fa605cdce0f8307e451cc0fd14e2eb4cd2e98a355b147766"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2139,9 +2149,9 @@ dependencies = [
 
 [[package]]
 name = "solana-logger"
-version = "2.0.14"
+version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7369915bd82d09dcb14a5ebba3431c4e54f19f2de0521ac56627d38016d45408"
+checksum = "367c5431bad14b10fbb62614b48720b746672558dba3244167ff7d251890c355"
 dependencies = [
  "env_logger",
  "lazy_static",

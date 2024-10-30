@@ -75,15 +75,8 @@ mod tests {
 
         let mut mollusk = Mollusk::new(&program_id, "target/deploy/native_escrow");
 
-        mollusk.add_program(
-            &spl_token::ID,
-            "src/tests/spl_token-3.5.0",
-            &mollusk_svm::program::loader_keys::LOADER_V3,
-        );
-        let (token_program, token_program_account) = (
-            spl_token::ID,
-            program::create_program_account_loader_v3(&spl_token::ID),
-        );
+        mollusk_token::token::add_program(&mut mollusk);
+        let (token_program, token_program_account) = mollusk_token::token::keyed_account();
 
         // Accounts
         let maker = Pubkey::new_unique();
@@ -225,15 +218,8 @@ mod tests {
 
         let mut mollusk = Mollusk::new(&program_id, "target/deploy/native_escrow");
 
-        mollusk.add_program(
-            &spl_token::ID,
-            "src/tests/spl_token-3.5.0",
-            &mollusk_svm::program::loader_keys::LOADER_V3,
-        );
-        let (token_program, token_program_account) = (
-            spl_token::ID,
-            program::create_program_account_loader_v3(&spl_token::ID),
-        );
+        mollusk_token::token::add_program(&mut mollusk);
+        let (token_program, token_program_account) = mollusk_token::token::keyed_account();
 
         // Accounts
         let taker = Pubkey::new_unique();

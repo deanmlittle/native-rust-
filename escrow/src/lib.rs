@@ -1,6 +1,5 @@
 mod instructions;
 use instructions::*;
-// mod pinocchio_spl;
 mod state;
 
 use make::make;
