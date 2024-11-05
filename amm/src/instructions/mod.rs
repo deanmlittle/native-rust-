@@ -1,10 +1,10 @@
 use pinocchio::program_error::ProgramError;
 
-pub mod initialize;
 pub mod deposit;
-pub mod withdraw;
-pub mod swap;
+pub mod initialize;
 pub mod lock;
+pub mod swap;
+pub mod withdraw;
 
 #[derive(Clone, Copy, Debug)]
 pub enum AmmInstruction {

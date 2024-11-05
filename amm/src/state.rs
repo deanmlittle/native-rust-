@@ -4,16 +4,18 @@ use pinocchio::{account_info::AccountInfo, pubkey::Pubkey};
 ///
 /// -- Config --
 /// > Seed: u16
-/// > Authority: Option<Pubkey>
-/// > MintX: Pubkey - Superfluous but useful for the UI
-/// > MintY: Pubkey - Superfluous but useful for the UI
+/// > Authority: Flag<Pubkey>
+/// > MintX: Pubkey
+/// > MintY: Pubkey
+/// > MintLP: Pubkey
 /// > VaultX: Pubkey
 /// > VaultY: Pubkey
-/// < MintLP: Pubkey
+/// > Fee: u16
+/// > AuthorityBump: u8
 pub struct Config(*const u8);
 
 impl Config {
-    pub const LEN: usize = 2 + 1 + 32 + 32 + 32 + 32 + 32; 
+    pub const LEN: usize = 2 + 1 + 32 + 32 + 32 + 32 + 32 + 32 + 1;
 
     #[inline(always)]
     pub fn from_account_info_unchecked(account_info: &AccountInfo) -> Self {
@@ -30,32 +32,12 @@ impl Config {
         unsafe { *(self.0 as *const u16) }
     }
 
-    pub fn has_update_authority(&self) -> bool {
-        unsafe { *(self.0 as *const u8).add(2) == 1 }
+    pub fn get_status(&self) -> u8 {
+        unsafe { *(self.0 as *const u8).add(2) }
     }
 
-    pub fn is_immutable(&self) -> bool {
-        unsafe { *(self.0 as *const u8).add(2) == 1 }
-    }
-
-    pub fn is_frozen(&self) -> bool {
-        unsafe { *(self.0 as *const u8).add(2) == 2 }
-    }
-
-    pub fn update_authority(&self) -> Option<Pubkey> {
-        if self.has_update_authority() {
-            Some(unsafe { *(self.0 as *const [u8; 32]).add(3) })
-        } else {
-            None
-        }
-    }
-
-    pub fn lock_authority(&self) -> Option<Pubkey> {
-        if self.is_frozen() {
-            Some(unsafe { *(self.0 as *const [u8; 32]).add(3) })
-        } else {
-            None
-        }
+    pub fn update_authority(&self) -> Pubkey {
+        unsafe { *(self.0 as *const [u8; 32]).add(3) }
     }
 
     pub fn mint_x(&self) -> Pubkey {
@@ -66,16 +48,23 @@ impl Config {
         unsafe { *(self.0 as *const [u8; 32]).add(67) }
     }
 
-    pub fn vault_x(&self) -> Pubkey {
+    pub fn mint_lp(&self) -> Pubkey {
         unsafe { *(self.0 as *const [u8; 32]).add(99) }
     }
 
-    pub fn vault_y(&self) -> Pubkey {
+    pub fn vault_x(&self) -> Pubkey {
         unsafe { *(self.0 as *const [u8; 32]).add(131) }
     }
 
-    pub fn mint_lp(&self) -> Pubkey {
+    pub fn vault_y(&self) -> Pubkey {
         unsafe { *(self.0 as *const [u8; 32]).add(163) }
     }
 
+    pub fn fee(&self) -> u16 {
+        unsafe { *(self.0 as *const u16).add(195) }
+    }
+
+    pub fn authority_bump(&self) -> u8 {
+        unsafe { *(self.0 as *const u8).add(197) }
+    }
 }

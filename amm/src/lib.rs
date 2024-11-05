@@ -1,6 +1,8 @@
 mod instructions;
 use instructions::AmmInstruction;
-use instructions::{initialize::initialize, deposit::deposit, withdraw::withdraw, swap::swap, lock::lock};
+use instructions::{
+    deposit::deposit, initialize::initialize, lock::lock, swap::swap, withdraw::withdraw,
+};
 mod state;
 mod tests;
 
@@ -30,6 +32,6 @@ fn process_instruction(
         AmmInstruction::Deposit => deposit(accounts, data),
         AmmInstruction::Withdraw => withdraw(accounts, data),
         AmmInstruction::Swap => swap(accounts, data),
-        AmmInstruction::Lock => lock(accounts, data),
+        AmmInstruction::Lock => lock(accounts),
     }
 }
