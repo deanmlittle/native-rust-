@@ -3,7 +3,6 @@ use pinocchio::{account_info::AccountInfo, pubkey::Pubkey};
 /// # State
 ///
 /// -- Config --
-/// > Seed: u16
 /// > Authority: Flag<Pubkey>
 /// > MintX: Pubkey
 /// > MintY: Pubkey
@@ -15,7 +14,7 @@ use pinocchio::{account_info::AccountInfo, pubkey::Pubkey};
 pub struct Config(*const u8);
 
 impl Config {
-    pub const LEN: usize = 2 + 1 + 32 + 32 + 32 + 32 + 32 + 32 + 1;
+    pub const LEN: usize = 1 + 32 + 32 + 32 + 32 + 32 + 32 + 2 + 1;
 
     #[inline(always)]
     pub fn from_account_info_unchecked(account_info: &AccountInfo) -> Self {
@@ -28,43 +27,39 @@ impl Config {
         Self::from_account_info_unchecked(account_info)
     }
 
-    pub fn seed(&self) -> u16 {
-        unsafe { *(self.0 as *const u16) }
-    }
-
     pub fn get_status(&self) -> u8 {
-        unsafe { *(self.0 as *const u8).add(2) }
+        unsafe { *(self.0 as *const u8) }
     }
 
     pub fn update_authority(&self) -> Pubkey {
-        unsafe { *(self.0 as *const [u8; 32]).add(3) }
+        unsafe { *(self.0 as *const [u8; 32]).add(1) }
     }
 
     pub fn mint_x(&self) -> Pubkey {
-        unsafe { *(self.0 as *const [u8; 32]).add(35) }
+        unsafe { *(self.0 as *const [u8; 32]).add(33) }
     }
 
     pub fn mint_y(&self) -> Pubkey {
-        unsafe { *(self.0 as *const [u8; 32]).add(67) }
+        unsafe { *(self.0 as *const [u8; 32]).add(65) }
     }
 
     pub fn mint_lp(&self) -> Pubkey {
-        unsafe { *(self.0 as *const [u8; 32]).add(99) }
+        unsafe { *(self.0 as *const [u8; 32]).add(97) }
     }
 
     pub fn vault_x(&self) -> Pubkey {
-        unsafe { *(self.0 as *const [u8; 32]).add(131) }
+        unsafe { *(self.0 as *const [u8; 32]).add(129) }
     }
 
     pub fn vault_y(&self) -> Pubkey {
-        unsafe { *(self.0 as *const [u8; 32]).add(163) }
+        unsafe { *(self.0 as *const [u8; 32]).add(161) }
     }
 
     pub fn fee(&self) -> u16 {
-        unsafe { *(self.0 as *const u16).add(195) }
+        unsafe { *(self.0 as *const u16).add(193) }
     }
 
     pub fn authority_bump(&self) -> u8 {
-        unsafe { *(self.0 as *const u8).add(197) }
+        unsafe { *(self.0 as *const u8).add(195) }
     }
 }

@@ -1,10 +1,6 @@
 use constant_product_curve::xy_deposit_amounts_from_l;
 use pinocchio::{
-    account_info::AccountInfo,
-    instruction::{Seed, Signer},
-    program_error::ProgramError,
-    sysvars::{clock::Clock, Sysvar},
-    ProgramResult,
+    account_info::AccountInfo, instruction::{Seed, Signer}, msg, program_error::ProgramError, sysvars::{clock::Clock, Sysvar}, ProgramResult
 };
 use pinocchio_token::{
     instructions::{MintTo, Transfer},
@@ -44,6 +40,13 @@ pub fn deposit(accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
 
     // Checks
     let config_account = Config::from_account_info(config);
+    msg!("Mint X {:?}", config_account.mint_x());
+    msg!("Mint Y {:?}", config_account.mint_y());
+    msg!("Mint LP {:?}", config_account.mint_lp());
+    msg!("Vault X {:?}", config_account.vault_x());
+    msg!("Vault Y {:?}", config_account.vault_y());
+    msg!("Fee {:?}", config_account.fee());
+
     assert_ne!(config_account.get_status(), 1);
     assert_eq!(mint_lp.key(), &config_account.mint_lp());
     assert_eq!(vault_x.key(), &config_account.vault_x());
