@@ -32,34 +32,34 @@ impl Config {
     }
 
     pub fn update_authority(&self) -> Pubkey {
-        unsafe { *(self.0 as *const [u8; 32]).add(1) }
+        unsafe { *(self.0.add(1) as *const [u8; 32]) }
     }
 
     pub fn mint_x(&self) -> Pubkey {
-        unsafe { *(self.0 as *const [u8; 32]).add(33) }
+        unsafe { *(self.0.add(33) as *const [u8; 32]) }
     }
 
     pub fn mint_y(&self) -> Pubkey {
-        unsafe { *(self.0 as *const [u8; 32]).add(65) }
+        unsafe { *(self.0.add(65) as *const [u8; 32]) }
     }
 
     pub fn mint_lp(&self) -> Pubkey {
-        unsafe { *(self.0 as *const [u8; 32]).add(97) }
+        unsafe { *(self.0.add(97) as *const [u8; 32]) }
     }
 
     pub fn vault_x(&self) -> Pubkey {
-        unsafe { *(self.0 as *const [u8; 32]).add(129) }
+        unsafe { *(self.0.add(129) as *const [u8; 32]) }
     }
 
     pub fn vault_y(&self) -> Pubkey {
-        unsafe { *(self.0 as *const [u8; 32]).add(161) }
+        unsafe { *(self.0.add(161) as *const [u8; 32]) }
     }
 
     pub fn fee(&self) -> u16 {
-        unsafe { *(self.0 as *const u16).add(193) }
+        unsafe { *(self.0.add(193) as *const u16) }
     }
 
     pub fn authority_bump(&self) -> u8 {
-        unsafe { *(self.0 as *const u8).add(195) }
+        unsafe { *(self.0.add(195) as *const u8) }
     }
 }

@@ -40,6 +40,7 @@ pub fn deposit(accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
 
     // Checks
     let config_account = Config::from_account_info(config);
+
     msg!("Mint X {:?}", config_account.mint_x());
     msg!("Mint Y {:?}", config_account.mint_y());
     msg!("Mint LP {:?}", config_account.mint_lp());

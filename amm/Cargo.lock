@@ -1746,9 +1746,9 @@ dependencies = [
 
 [[package]]
 name = "pinocchio-token"
-version = "0.1.0"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c151947d09c4e5ab0abf425500dce93736bacea5e156a179966bf25bde84ed19"
+checksum = "d26be1aa48707c14bcaa0dd1ee93aaa58eda2b8c76cb2bc557012f9d0608d62f"
 dependencies = [
  "pinocchio",
  "pinocchio-pubkey",

@@ -3,7 +3,7 @@ mod tests {
     use mollusk_svm::{result::Check, Mollusk};
 
     use solana_sdk::{
-        account::{AccountSharedData, WritableAccount},
+        account::{AccountSharedData, ReadableAccount, WritableAccount},
         instruction::{AccountMeta, Instruction},
         program_option::COption,
         program_pack::Pack,
@@ -251,6 +251,8 @@ mod tests {
                 AccountMeta::new(token_program, false),
             ],
         );
+
+        println!("{:?}", config_account.data());
 
         mollusk.process_and_validate_instruction(
             &instruction,
