@@ -14,7 +14,6 @@ mod tests {
     use crate::state::Config;
 
     #[test]
-    #[ignore = "working"]
     fn initialize() {
         let program_id = Pubkey::new_from_array(five8_const::decode_32_const(
             "22222222222222222222222222222222222222222222",
@@ -652,6 +651,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "working"]
     fn lock() {
         let program_id = Pubkey::new_from_array(five8_const::decode_32_const(
             "22222222222222222222222222222222222222222222",

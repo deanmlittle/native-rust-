@@ -30,7 +30,7 @@ pub fn initialize(accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
 
     // Populate Config
     unsafe {
-        config.borrow_mut_data_unchecked().copy_from_slice(data);
+        *(config.borrow_mut_data_unchecked().as_ptr() as *mut &[u8]) = data;
     };
 
     Ok(())
