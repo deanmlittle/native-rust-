@@ -42,7 +42,7 @@ pub fn swap(accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
     // Checks
     let config_account = Config::from_account_info(config);
     assert_ne!(config_account.get_status(), 1);
-    assert!(expiration > Clock::get()?.unix_timestamp);
+    assert!(expiration < Clock::get()?.unix_timestamp);
 
     let is_x = vault_from.key().eq(&config_account.vault_x());
     if is_x {
